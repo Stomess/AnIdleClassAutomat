@@ -4,7 +4,7 @@ _**IdleClassAutocrat** was initiated by Argembarger for the game <https://www.sm
 1. copy the content of the js-file to your browser console
 2. your're done
 
-# what to exspect ( grade of automation! )
+# what to expect ( grade of automation! )
 + name your business ( you can change that ( later ( by yourself ) ) )
 + earn some cash ( manually ( by clicking ( a lot ) ) )
 + hire employees
