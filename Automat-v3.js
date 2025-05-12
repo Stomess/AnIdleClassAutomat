@@ -25,26 +25,27 @@ class IdleClassAutocrat {
 
   currentBankruptcyStatsIndex = 38; // Current bankruptcy bonus in game.stats[]
 
-  // THE REST BELOW SHOULDN'T NEED TO BE MESSED WITH
-  currOuterProcessHandle = 0; // Everything else is private
-  currProcess = 0; // PRIVATE
-  currProcessHandle = 0; // PRIVATE
-  currUpgrade; // STILL PRIVATE
-  currEmployee; // ETC.
-  currMail;
-  currOutgoing;
-  outgoingMailDelay = 0;
-  invBought;
-  invChecks;
-  invTargetMins;
-  invTargetMs;
-  invFoundTarget;
-  invSorted;
-  invAcquired;
-  currAcq;
-  acqCurrWorker;
-  acqCurrChat;
-  acqCurrMail;
+  // Everything else is private
+  #currOuterProcessHandle = 0;
+  #currProcess = 0;
+  #currProcessHandle = 0;
+  #currUpgrade;
+  #currEmployee;
+  #currMail;
+  #currOutgoing;
+  #outgoingMailDelay = 0;
+  #invBought;
+  #invChecks;
+  #invTargetMins;
+  #invTargetMs;
+  #invFoundTarget;
+  #invSorted;
+  #invAcquired;
+  #currAcq;
+  #acqCurrWorker;
+  #acqCurrChat;
+  #acqCurrMail;
+
   autocratSelfNaming() {
     if(game.businessName().name() !== "Unnamed Business") return;
     let pastBizCheckIndex = -1;
@@ -84,9 +85,9 @@ class IdleClassAutocrat {
       game.buyAllUpgrades();
     } else {
       for(let i = 0; i < game.availableUpgrades().length; i++) {
-        this.currUpgrade = game.availableUpgrades()[i];
-        if(this.currUpgrade.price.val() < (game.currentCash.val() * this.upgradeSpendFraction)) {
-          this.currUpgrade.buy();
+        this.#currUpgrade = game.availableUpgrades()[i];
+        if(this.#currUpgrade.price.val() < (game.currentCash.val() * this.upgradeSpendFraction)) {
+          this.#currUpgrade.buy();
         }
       }
     }
@@ -94,16 +95,16 @@ class IdleClassAutocrat {
   autoHR() {
     // reverse the loop | in favour of more "productive" units
     for(let i = 11; i >= 0; i--) {
-      this.currEmployee = game.units.peek()[i];
+      this.#currEmployee = game.units.peek()[i];
       // No cheating, Sir (:
-      if(!this.currEmployee.available()) continue;
+      if(!this.#currEmployee.available()) continue;
       // Based on current share of total income
-      let fairShare = parseFloat(this.currEmployee.shareOfTotal()) / 100;
+      let fairShare = parseFloat(this.#currEmployee.shareOfTotal()) / 100;
       // ( if possible ) always buy til first 5 | to activate next higher unit
-      if(this.currEmployee.num.val() <= 4 && (this.currEmployee.price.val() <= game.currentCash.val())) {
-        this.currEmployee.buy();
-      } else if(this.currEmployee.price.val() < (game.currentCash.val() * fairShare)) {
-        this.currEmployee.buy();
+      if(this.#currEmployee.num.val() <= 4 && (this.#currEmployee.price.val() <= game.currentCash.val())) {
+        this.#currEmployee.buy();
+      } else if(this.#currEmployee.price.val() < (game.currentCash.val() * fairShare)) {
+        this.#currEmployee.buy();
       }
     }
   };
@@ -111,26 +112,26 @@ class IdleClassAutocrat {
     this.autoOutgoingMail();
     // Automatically replies to emails with "<sender_name>: <string_of_biz_babble>"
     for(let i = game.mail().length - 1; i >= 0; i--) {
-      this.currMail = game.mail()[i];
+      this.#currMail = game.mail()[i];
       // EMAIL CHEAT: You can uncomment the following line to exploit emails
-      if(this.currMail.replied() === true) { continue; }
-      this.currMail.inputText(this.currMail.from + ",");
-      while(this.currMail.inputText().length < 180) {
-        this.currMail.inputText(this.currMail.inputText() + " " + this.randomBizWord());
+      if(this.#currMail.replied() === true) { continue; }
+      this.#currMail.inputText(this.#currMail.from + ",");
+      while(this.#currMail.inputText().length < 180) {
+        this.#currMail.inputText(this.#currMail.inputText() + " " + this.randomBizWord());
       }
       // Uncomment to catch what these actually are in console, for funsies :)
-      //console.log("" + this.currMail.inputText());
-      this.currMail.respond();
+      //console.log("" + this.#currMail.inputText());
+      this.#currMail.respond();
     }
   };
   autoOutgoingMail() {
     // Send random emails to departments unless stress is above 50% (then spam to HR)
-    if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.outgoingMailDelay === 0) {
-      this.outgoingMailDelay = 1;
-      this.currOutgoing = game.composedMail();
-      if(this.currOutgoing.stressLevel.val() > 50) {
+    if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.#outgoingMailDelay === 0) {
+      this.#outgoingMailDelay = 1;
+      this.#currOutgoing = game.composedMail();
+      if(this.#currOutgoing.stressLevel.val() > 50) {
         // Human Resources
-        this.currOutgoing.selectedDepartment('4');
+        this.#currOutgoing.selectedDepartment('4');
       } else {
         // Random other. 0 = investments, 1 = r&d, 2 = acquisitions. R&D is available before investments.
         let r = Math.random();
@@ -138,15 +139,15 @@ class IdleClassAutocrat {
         if(game.activeInvestments().length === 0) { r = r * 0.666; }
         // No investments; additionally constrain to [0...0.333], or just 1
         if(game.activeInvestments().length === 0) { r = r * 0.5; }
-        this.currOutgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
+        this.#currOutgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
         r = Math.random();
-        this.currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
+        this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
       }
       let rando = this.randomName();
-      this.currOutgoing.to(rando);
-      this.currOutgoing.subject(rando + this.randomDialogue());
-      while(this.currOutgoing.message().length < 180) {
-        this.currOutgoing.message(this.currOutgoing.message() + " " + this.randomBizWord());
+      this.#currOutgoing.to(rando);
+      this.#currOutgoing.subject(rando + this.randomDialogue());
+      while(this.#currOutgoing.message().length < 180) {
+        this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord());
       }
       setTimeout(this.autoSendMail, 2000);
       setTimeout(this.autoStopWaitingForMail, 5000);
@@ -156,7 +157,7 @@ class IdleClassAutocrat {
     game.composedMail().send();
   };
   autoStopWaitingForMail() {
-    activeIdleClassAutocrat.outgoingMailDelay = 0;
+    activeIdleClassAutocrat.#outgoingMailDelay = 0;
   };
   autoScience() {
     // Disables research to sell patents
@@ -197,39 +198,39 @@ class IdleClassAutocrat {
   };
   autoInvest() {
     if(game.activeInvestments().length < game.simultaneousInvestments.val()) {
-      this.invBought = false;
-      this.invChecks = 0;
+      this.#invBought = false;
+      this.#invChecks = 0;
       // Check existing investment target times, fill shortest-found slot
       // Remember that target time is in milliseconds; 1 min = 60000 ms
       // Desired target times by default are 1, 12, 70, 1:59, 2:59, etc...
       // Desired percentages by default are based on number of slots
       // 1 slot = 50%, 2 = 40%, 3 = 30%, 4 = 20%, 5+ = 10%
-      while(this.invBought === false) {
-        this.invTargetMins = 1;
-        this.invTargetMs = 60000;
-        this.invFoundTarget = false;
-        if(this.invChecks === 1) {
-          this.invTargetMins = 12;
-          this.invTargetMs = 12 * 60000;
+      while(this.#invBought === false) {
+        this.#invTargetMins = 1;
+        this.#invTargetMs = 60000;
+        this.#invFoundTarget = false;
+        if(this.#invChecks === 1) {
+          this.#invTargetMins = 12;
+          this.#invTargetMs = 12 * 60000;
         }
-        else if(this.invChecks === 2) {
-          this.invTargetMins = 70;
-          this.invTargetMs = 70 * 60000;
+        else if(this.#invChecks === 2) {
+          this.#invTargetMins = 70;
+          this.#invTargetMs = 70 * 60000;
         }
-        else if(this.invChecks > 2) {
-          this.invTargetMins = 59 + (60 * (this.invChecks - 2));
-          this.invTargetMs = this.invTargetMins * 60000;
+        else if(this.#invChecks > 2) {
+          this.#invTargetMins = 59 + (60 * (this.#invChecks - 2));
+          this.#invTargetMs = this.#invTargetMins * 60000;
         }
         for(let i = 0; i < game.activeInvestments().length; i++) {
-          if(game.activeInvestments()[i].targetTime === this.invTargetMs) {
-            this.invFoundTarget = true;
+          if(game.activeInvestments()[i].targetTime === this.#invTargetMs) {
+            this.#invFoundTarget = true;
           }
         }
-        if(this.invFoundTarget === true) {
-          this.invChecks++;
+        if(this.#invFoundTarget === true) {
+          this.#invChecks++;
         } else {
-          this.invBought = true;
-          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), this.invTargetMins);
+          this.#invBought = true;
+          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), this.#invTargetMins);
         }
       }
     }
@@ -243,18 +244,18 @@ class IdleClassAutocrat {
           if(game.locked().acquisitions === false && game.simultaneousInvestments.val() > 1 && game.activeAcquisitions().length < game.simultaneousAcquisitions.val()) {
             // Only acquire investments if some better investment is not closer to completion than
             // half of the finished investment's original target time.
-            this.invSorted = game.activeInvestments().slice();
-            this.invAcquired = false;
-            this.invSorted.sort(function(a, b){return b.targetTime - a.targetTime});
-            for(let j = 0; j < this.invSorted.length; j++) {
-              if(this.invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
-                this.invAcquired = true;
+            this.#invSorted = game.activeInvestments().slice();
+            this.#invAcquired = false;
+            this.#invSorted.sort(function(a, b){return b.targetTime - a.targetTime});
+            for(let j = 0; j < this.#invSorted.length; j++) {
+              if(this.#invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
+                this.#invAcquired = true;
                 break;
-              } else if(this.invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
+              } else if(this.#invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
                 break;
               }
             }
-            if(this.invAcquired === false) {
+            if(this.#invAcquired === false) {
               game.activeInvestments()[i].handlePayout();
             } else {
               game.activeInvestments()[i].handleAcquisition();
@@ -271,53 +272,53 @@ class IdleClassAutocrat {
   autoBankruptcy() {
     // i suggest always check out from the first game as soon as possible | as this unlocks goals ( wich further increases the multiplier )
     if( game.bankruptcies.val() === 0 || game.nextBankruptcyBonus.val() > game.stats[this.currentBankruptcyStatsIndex].val() * this.bankruptcyResetFraction ) {
-      this.currProcess = 0;
+      this.#currProcess = 0;
       game.restartGame();
     }
   };
   autoMicromanage() {
     for (let i = game.activeAcquisitions().length - 1; i >= 0; i--) {
-      this.currAcq = game.activeAcquisitions()[i];
+      this.#currAcq = game.activeAcquisitions()[i];
       // Acquisition Clicker
-      this.currAcq.fire();
+      this.#currAcq.fire();
 
       // Acquisition AutoAssign
-      if(this.currAcq.currentEmployees.val() > this.currAcq.initialEmployees * this.acquisitionStopHiringFraction) {
-        for(let j = 0; j < this.currAcq.workers().length; j++) {
-          this.acqCurrWorker = this.currAcq.workers()[j];
-          if(this.acqCurrWorker.price.val() < game.currentCash.val()) {
-            this.acqCurrWorker.hire();
+      if(this.#currAcq.currentEmployees.val() > this.#currAcq.initialEmployees * this.acquisitionStopHiringFraction) {
+        for(let j = 0; j < this.#currAcq.workers().length; j++) {
+          this.#acqCurrWorker = this.#currAcq.workers()[j];
+          if(this.#acqCurrWorker.price.val() < game.currentCash.val()) {
+            this.#acqCurrWorker.hire();
           }
         }
       }
 
       // Acquisition AutoChat
       // The cleanest way to handle these is by using the document elements.
-      for(let j = this.currAcq.chats().length - 1; j >= 0; j--) {
-        this.acqCurrChat = this.currAcq.chats()[j];
-        if(this.acqCurrChat.finished() === true) {
-          this.acqCurrChat.close();
-        } else if(this.acqCurrChat.messages().length > 0 && this.acqCurrChat.messages()[this.acqCurrChat.messages().length - 1].source !== "You") {
-          this.acqCurrChat.select();
-          document.getElementById('chat-response').value = this.acqCurrChat.name + this.randomDialogue();
+      for(let j = this.#currAcq.chats().length - 1; j >= 0; j--) {
+        this.#acqCurrChat = this.#currAcq.chats()[j];
+        if(this.#acqCurrChat.finished() === true) {
+          this.#acqCurrChat.close();
+        } else if(this.#acqCurrChat.messages().length > 0 && this.#acqCurrChat.messages()[this.#acqCurrChat.messages().length - 1].source !== "You") {
+          this.#acqCurrChat.select();
+          document.getElementById('chat-response').value = this.#acqCurrChat.name + this.randomDialogue();
           document.getElementsByClassName("chat-submit")[0].click();
         }
       }
 
       // Acquisition AutoPolicy
-      for(let j = this.currAcq.mail().length - 1; j >= 0; j--) {
-        this.acqCurrMail = this.currAcq.mail()[j];
-        if(this.acqCurrMail.replied() === true) { continue; }
-        this.acqCurrMail.inputText(this.acqCurrMail.from + ",");
-        while(this.acqCurrMail.inputText().length < 180) {
-          this.acqCurrMail.inputText(this.acqCurrMail.inputText() + " " + this.randomBizWord());
+      for(let j = this.#currAcq.mail().length - 1; j >= 0; j--) {
+        this.#acqCurrMail = this.#currAcq.mail()[j];
+        if(this.#acqCurrMail.replied() === true) { continue; }
+        this.#acqCurrMail.inputText(this.#acqCurrMail.from + ",");
+        while(this.#acqCurrMail.inputText().length < 180) {
+          this.#acqCurrMail.inputText(this.#acqCurrMail.inputText() + " " + this.randomBizWord());
         }
-        this.acqCurrMail.respond();
+        this.#acqCurrMail.respond();
       }
 
       // Acquisition Sell
-      if(this.currAcq.sold() === false && this.currAcq.currentEmployees.val() === 0) {
-        this.currAcq.sell();
+      if(this.#currAcq.sold() === false && this.#currAcq.currentEmployees.val() === 0) {
+        this.#currAcq.sell();
       }
     }
   };
@@ -375,54 +376,54 @@ class IdleClassAutocrat {
   autoAutocrat() { // fractionOfCurrentBankruptcyBonus
     this.autocratSelfNaming();
     this.unlockCartel();
-    switch(this.currProcess) {
+    switch(this.#currProcess) {
       case 0: // Not running; new Autocrat state. Clear any existing loop and start pre-email loop.
-        this.currProcess = 1;
-        if(this.currProcessHandle !== 0) { clearInterval(this.currProcessHandle); }
-        this.currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 1;
+        if(this.#currProcessHandle !== 0) { clearInterval(this.#currProcessHandle); }
+        this.#currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.autocratInnerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
         if(game.locked().mail === true) { break; }
-        this.currProcess = 2;
-        clearInterval(this.currProcessHandle);
-        this.currProcessHandle = setInterval(this.autoUntilInvestments.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 2;
+        clearInterval(this.#currProcessHandle);
+        this.#currProcessHandle = setInterval(this.autoUntilInvestments.bind(this), this.autocratInnerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
         if(game.locked().investments === true) { break; }
-        this.currProcess = 3;
-        clearInterval(this.currProcessHandle);
-        this.currProcessHandle = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 3;
+        clearInterval(this.#currProcessHandle);
+        this.#currProcessHandle = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.autocratInnerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
         if(game.locked().research === true) { break; }
-        this.currProcess = 4;
-        clearInterval(this.currProcessHandle);
-        this.currProcessHandle = setInterval(this.autoUntilBankruptcy.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 4;
+        clearInterval(this.#currProcessHandle);
+        this.#currProcessHandle = setInterval(this.autoUntilBankruptcy.bind(this), this.autocratInnerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
         if(game.locked().bankruptcy === true) { break; }
-        this.currProcess = 5;
-        clearInterval(this.currProcessHandle);
-        this.currProcessHandle = setInterval(this.autoUntilAcquisitions.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 5;
+        clearInterval(this.#currProcessHandle);
+        this.#currProcessHandle = setInterval(this.autoUntilAcquisitions.bind(this), this.autocratInnerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
         if(game.locked().acquisitions === true) { break; }
-        this.currProcess = 6;
-        clearInterval(this.currProcessHandle);
-        this.currProcessHandle = setInterval(this.autoUntilInfinity.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcess = 6;
+        clearInterval(this.#currProcessHandle);
+        this.#currProcessHandle = setInterval(this.autoUntilInfinity.bind(this), this.autocratInnerLoopMillis);
         break;
         break;
       case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
         break;
       default:
-        this.currProcess = 0;
+        this.#currProcess = 0;
     }
   };
 
   // Function to lazily kick off autocratManageLoopMillis outer loop
   autoAutoAutocrat() {
-    if(this.currOuterProcessHandle !== 0) { clearInterval(this.currOuterProcessHandle); }
-    this.currOuterProcessHandle = setInterval(this.autoAutocrat.bind(this), this.autocratManageLoopMillis);
+    if(this.#currOuterProcessHandle !== 0) { clearInterval(this.#currOuterProcessHandle); }
+    this.#currOuterProcessHandle = setInterval(this.autoAutocrat.bind(this), this.autocratManageLoopMillis);
   };
 
   // Static function to super-lazily kick off The Autocrat
