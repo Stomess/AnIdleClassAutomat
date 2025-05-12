@@ -4,7 +4,7 @@
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  * If it crashes your game, browser, machine, life.. start over ( or write your own stuff )
  */
-class IdleClassAutocrat {
+class IdleClassAutomat {
   // THE FOLLOWING 6 VALUES CAN BE TWEAKED TO YOUR LIKING
   // FEEL FREE TO TWEAK IF YOU FEEL LIKE THINGS ARE TOO SLOW
   // Especially the bankruptcy modifier...
@@ -428,11 +428,11 @@ class IdleClassAutocrat {
 
   // Static function to super-lazily kick off The Autocrat
   static autoAutoAutoAutocrat() {
-    var newlyBirthedAutocrat = new IdleClassAutocrat();
+    var newlyBirthedAutocrat = new IdleClassAutomat();
     newlyBirthedAutocrat.autoAutoAutocrat();
     return newlyBirthedAutocrat;
   }
 }
 
 // Actually kicks off the Autocrat.
-var activeIdleClassAutocrat = IdleClassAutocrat.autoAutoAutoAutocrat();
+var activeIdleClassAutocrat = IdleClassAutomat.autoAutoAutoAutocrat();
