@@ -372,8 +372,8 @@ class IdleClassAutomat {
     this.autoBankruptcy();
     this.autoMicromanage();
   };
-  // Function to manage state of autocratInnerLoopMillis inner loop
-  autoAutocrat() { // fractionOfCurrentBankruptcyBonus
+
+  manageStateOfInnerLoop() {
     this.autocratSelfNaming();
     this.unlockCartel();
     switch(this.#currProcess) {
@@ -420,14 +420,13 @@ class IdleClassAutomat {
     }
   };
 
-  // Function to lazily kick off autocratManageLoopMillis outer loop
-  autoAutoAutocrat() {
+  lazilyKickOffOuterLoop() {
     if(this.#currOuterProcessHandle !== 0) { clearInterval(this.#currOuterProcessHandle); }
-    this.#currOuterProcessHandle = setInterval(this.autoAutocrat.bind(this), this.autocratManageLoopMillis);
+    this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.autocratManageLoopMillis);
   };
 
   constructor() {
-    this.autoAutoAutocrat()
+    this.lazilyKickOffOuterLoop()
   }
 }
 
