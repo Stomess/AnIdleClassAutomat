@@ -426,13 +426,10 @@ class IdleClassAutomat {
     this.#currOuterProcessHandle = setInterval(this.autoAutocrat.bind(this), this.autocratManageLoopMillis);
   };
 
-  // Static function to super-lazily kick off The Autocrat
-  static autoAutoAutoAutocrat() {
-    var newlyBirthedAutocrat = new IdleClassAutomat();
-    newlyBirthedAutocrat.autoAutoAutocrat();
-    return newlyBirthedAutocrat;
+  constructor() {
+    this.autoAutoAutocrat()
   }
 }
 
 // Actually kicks off the Autocrat.
-var activeIdleClassAutocrat = IdleClassAutomat.autoAutoAutoAutocrat();
+var activeIdleClassAutocrat = new IdleClassAutomat();
