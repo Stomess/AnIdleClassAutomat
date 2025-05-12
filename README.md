@@ -1,8 +1,10 @@
 _**IdleClassAutocrat** was initiated by Argembarger for the game <https://www.smallgraygames.com/the-idle-class>_
 
 # how to use
-1. copy the content of the js-file to your browser console
-2. your're done
+1. copy the content of the js-file to your browser console ( f12 for most common internet-accesspoints )
+2. hit enter ( dummy )
+    + congratz ( you might have accomplished your first offline achievement )
+    + ( in the unlikely event of not knowing what you're doin here, feel free to ask your neighbor ( or simply don't do it ) )
 
 # what to expect ( grade of automation! )
 + name your business ( you can change that ( later ( by yourself ) ) )

@@ -1,26 +1,9 @@
 "use strict";
-// The Idle Class Autocrat
-// made with luv by argembarger
-// v3.4.7, last tested with The Idle Class v0.8.2
-// USE AT OWN RISK -- feel free to steal
-// not responsible if your game gets hurt >_>
-// Export Early / Export Often
-// There are options! Skim through the code to see ‘em
-// Settings are in the constructor right underneath these comments.
-// See the very bottom of this script for the actual loop function.
-//
-// Instructions: just copy this entire text file (ctrl-a, ctrl-c)
-// and paste it (ctrl-v) into the console, and hit enter to submit
-// (Use F12 to access developer console on most browsers)
-// Only paste once!
-//
-// IMPORTANT NOTES:
-// You can change any of the below values at runtime 
-//     through the console by inputting activeIdleClassAutocrat.<desiredStatName> = <whatever>;
-// You have to re-inject this code on every refresh.
-// I have observed page-cache-wrecking errors on occasion, not sure if it's this script or just me messing around while making it.
-// I recommend exporting your save once in a while
-// Clearing the page's cache data through the browser can restore function if your save file gets corrupted and it fails to load.
+/* An Idle Class Automat v3.4.7
+ * Base structure shamelessly lended from argembarger (:
+ * During development constantly tested in Firefox on Linux with game version 0.8.2
+ * If it crashes your game, browser, machine, life.. start over ( or write your own stuff )
+ */
 class IdleClassAutocrat {
 	constructor() {
 		// THE FOLLOWING 6 VALUES CAN BE TWEAKED TO YOUR LIKING
