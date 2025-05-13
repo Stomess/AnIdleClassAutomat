@@ -8,7 +8,7 @@ class IdleClassAutomat {
   // TODO setter
   outerLoopMillis = 4000; // checks the game progress | every 4 seconds
   innerLoopMillis = 300; // handle most of the game for you | every 0.3 seconds
-  upgradeSpendFraction = 1.0; // willing to spend 100% on upgrades | ration 0.67 = 67%
+  cashSpendOnUpgrades = 1.0; // ration 0.67 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
@@ -77,12 +77,12 @@ class IdleClassAutomat {
     $(".top-click-value-display").text(game.earnedPerClick.displayVal()).fadeToggle()
   };
   autoUpgrade() {
-    if(this.upgradeSpendFraction >= 1.0) {
+    if(this.cashSpendOnUpgrades >= 1.0) {
       game.buyAllUpgrades();
     } else {
       for(let i = 0; i < game.availableUpgrades().length; i++) {
         this.#currUpgrade = game.availableUpgrades()[i];
-        if(this.#currUpgrade.price.val() < (game.currentCash.val() * this.upgradeSpendFraction)) {
+        if(this.#currUpgrade.price.val() < (game.currentCash.val() * this.cashSpendOnUpgrades)) {
           this.#currUpgrade.buy();
         }
       }
