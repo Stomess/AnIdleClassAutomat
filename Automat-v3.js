@@ -9,7 +9,6 @@ class IdleClassAutomat {
   outerLoopMillis = 2500; // checks the game progress | every 2.5 seconds
   innerLoopMillis = 100; // handle most of the game for you | every 0.1 seconds
   upgradeSpendFraction = 1.0; // willing to spend 100% on upgrades | ration 0.67 = 67%
-  maxAllowableRisk = 10.0; // Default 10.0%, stops R&D hiring above this risk value, PERCENTAGE VALUE, 67.0 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 0.1; // Default 0.1, makes every bankruptcy 110%, RATIO VALUE, 0.67 = 67%
 
@@ -156,41 +155,27 @@ class IdleClassAutomat {
   autoStopWaitingForMail() {
     activeIdleClassAutocrat.#outgoingMailDelay = 0;
   };
+  // little r&d-helper | to improve readability of if-statement
+  more(dict, offset = 10) {
+    let name = Object.keys(dict)[0];
+    let value = dict[name];
+
+    return game.research()[name]() + offset <= game.units.peek()[value].num.val()
+  }
+  /* just assign fckn all
+   * we will need the storage | for motivational emails #wink
+   * there are good reasons to turn away from your business from time to time
+   * ( that's when you need autosell )
+   */
   autoScience() {
-    // Disables research to sell patents
-    // Assigns employees only when research disabled (no cheating!)
-    // You can manually disable research in-game to update employee numbers
-    if(game.research().patents().length > 0) {
-      if(game.research().active() === true)  { game.research().toggleProduction(); }
-      else { game.research().sellPatents(); }
-    } else if(game.research().active() === false) {
-      if(game.research().risk.baseVal() <= this.maxAllowableRisk) {
-        let hiredSomeone = false;
-        if(game.research().intern() < game.units.peek(0)[0].num.val()) {
-          game.research().intern(parseInt(game.research().intern() + 1));
-          hiredSomeone = true;
-        }
-        if(game.research().wage() < game.units.peek(0)[1].num.val()) {
-          game.research().wage(parseInt(game.research().wage() + 1));
-          hiredSomeone = true;
-        }
-        // There is no need for autoselling.
-        //if(game.research().sales() < game.units.peek(0)[2].num.val()) {
-        // game.research().sales(parseInt(game.research().sales() + 1));
-        // hiredSomeone = true;
-        //}
-        // There is no need for storage.
-        //if(game.research().manager() < game.units.peek(0)[3].num.val()) {
-        // game.research().manager(parseInt(game.research().manager() + 1));
-        // hiredSomeone = true;
-        //}
-        if(hiredSomeone == false) { // Toggle production when no one to hire
-          game.research().toggleProduction();
-        }
-      }
-      else { // Toggle production when risk is reached
-        game.research().toggleProduction();
-      }
+    if( game.research().patents().length > 0 ) game.research().sellPatents();
+    // just preparing some real js-magic here
+    let intern = 0, wage = 1, sales = 2, manager = 3; // TODO see if we can do nicer than this
+    // simon sayz: only switch the machine off, if there are @ least 10 emps to "deploy" (:
+    if( this.more({intern}) || this.more({wage}) || this.more({sales}) || this.more({manager}) ) {
+      if( game.research().active() ) game.research().toggleProduction(); // off
+      game.research().assignMax();
+      game.research().toggleProduction(); // back on
     }
   };
   autoInvest() {
