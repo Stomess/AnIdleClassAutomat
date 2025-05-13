@@ -15,9 +15,6 @@ class IdleClassAutomat {
   // ONES WITH LISTS OF WORDS AND PHRASES CAN BE EDITED OR ADDED TO IF YOU FANCY
   autoBusinessWords = ['synergy', 'downsize', 'bandwidth', 'stakeholders', 'shareolders', 'clients', 'customers', 'profits', 'ROI', 'ideate', 'ideation', 'globalization', 'evergreen', 'disruptive', 'disrupt', 'innovation', 'innovate', 'dynamism', 'millennial', 'holistic', 'paradigm', 'wheelhouse', 'B2B', 'B2C', 'analytics', 'brand', 'branding', 'hyperlocal', 'optimization', 'client', 'customer', 'profit', 'outsourcing', 'outsource', 'startup', 'marketing', 'sales', 'agile', 'mission', 'executive', 'stocks', 'investments', 'investment', 'shares', 'valuation',  'investment', 'shareholders', 'BYOD', 'advertainment', 'marketing', 'deliverable', 'actionable', 'hacking', 'KPI', 'pivot', 'leverage', 'startup', 'downsizing', 'outsourcing', 'unicorn', 'SEO', 'wunderkind', 'market', 'EBITDA', 'ASAP', 'EOD', 'actionable', 'action', 'influencer', 'CTR', 'gamified', 'gamification', 'revenue', 'overhead'];
   autoChatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
-  // Shamelessly stolen from game code
-  firstNames = [ 'John', 'Jane', 'Steve', 'Bill', 'Mark', 'Sheryl', 'Larry', 'Travis', 'George', 'Marissa', 'Jeff', 'Ken', 'Dara', 'Richard' ];
-  lastNames = [ 'Smith', 'Johnson', 'Jones', 'Williams', 'Taylor', 'Singh', 'Wang', 'Sato', 'Kim', 'Tremblay', 'Rodriguez', 'Martin', 'Rossi', 'Schmidt' ];
 
   currentBankruptcyStatsIndex = 38; // Current bankruptcy bonus in game.stats[]
 
@@ -66,10 +63,6 @@ class IdleClassAutomat {
   };
   randomDialogue() {
     return this.autoChatPhrases[Math.floor(Math.random()*this.autoChatPhrases.length)];
-  };
-  // Shamelessly stolen from game code
-  randomName() {
-    return this.firstNames[Math.floor(Math.random() * this.firstNames.length)] + ' ' + this.lastNames[Math.floor(Math.random() * this.lastNames.length)];
   };
 
   autoEarnDollars() {
@@ -139,9 +132,8 @@ class IdleClassAutomat {
         r = Math.random();
         this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
       }
-      let rando = this.randomName();
-      this.#currOutgoing.to(rando);
-      this.#currOutgoing.subject(rando + this.randomDialogue());
+      this.#currOutgoing.to("John Wayne");
+      this.#currOutgoing.subject(this.randomDialogue());
       while(this.#currOutgoing.message().length < 180) {
         this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord());
       }
