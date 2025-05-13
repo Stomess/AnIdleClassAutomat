@@ -6,11 +6,11 @@
  */
 class IdleClassAutomat {
   // TODO setter
-  outerLoopMillis = 2500; // checks the game progress | every 2.5 seconds
-  innerLoopMillis = 100; // handle most of the game for you | every 0.1 seconds
+  outerLoopMillis = 4000; // checks the game progress | every 4 seconds
+  innerLoopMillis = 300; // handle most of the game for you | every 0.3 seconds
   upgradeSpendFraction = 1.0; // willing to spend 100% on upgrades | ration 0.67 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
-  bankruptcyResetFraction = 0.1; // Default 0.1, makes every bankruptcy 110%, RATIO VALUE, 0.67 = 67%
+  bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
   // ONES WITH LISTS OF WORDS AND PHRASES CAN BE EDITED OR ADDED TO IF YOU FANCY
   autoBusinessWords = ['synergy', 'downsize', 'bandwidth', 'stakeholders', 'shareolders', 'clients', 'customers', 'profits', 'ROI', 'ideate', 'ideation', 'globalization', 'evergreen', 'disruptive', 'disrupt', 'innovation', 'innovate', 'dynamism', 'millennial', 'holistic', 'paradigm', 'wheelhouse', 'B2B', 'B2C', 'analytics', 'brand', 'branding', 'hyperlocal', 'optimization', 'client', 'customer', 'profit', 'outsourcing', 'outsource', 'startup', 'marketing', 'sales', 'agile', 'mission', 'executive', 'stocks', 'investments', 'investment', 'shares', 'valuation',  'investment', 'shareholders', 'BYOD', 'advertainment', 'marketing', 'deliverable', 'actionable', 'hacking', 'KPI', 'pivot', 'leverage', 'startup', 'downsizing', 'outsourcing', 'unicorn', 'SEO', 'wunderkind', 'market', 'EBITDA', 'ASAP', 'EOD', 'actionable', 'action', 'influencer', 'CTR', 'gamified', 'gamification', 'revenue', 'overhead'];
