@@ -12,8 +12,8 @@ class IdleClassAutomat {
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
-  // ONES WITH LISTS OF WORDS AND PHRASES CAN BE EDITED OR ADDED TO IF YOU FANCY
-  autoBusinessWords = ['synergy', 'downsize', 'bandwidth', 'stakeholders', 'shareolders', 'clients', 'customers', 'profits', 'ROI', 'ideate', 'ideation', 'globalization', 'evergreen', 'disruptive', 'disrupt', 'innovation', 'innovate', 'dynamism', 'millennial', 'holistic', 'paradigm', 'wheelhouse', 'B2B', 'B2C', 'analytics', 'brand', 'branding', 'hyperlocal', 'optimization', 'client', 'customer', 'profit', 'outsourcing', 'outsource', 'startup', 'marketing', 'sales', 'agile', 'mission', 'executive', 'stocks', 'investments', 'investment', 'shares', 'valuation',  'investment', 'shareholders', 'BYOD', 'advertainment', 'marketing', 'deliverable', 'actionable', 'hacking', 'KPI', 'pivot', 'leverage', 'startup', 'downsizing', 'outsourcing', 'unicorn', 'SEO', 'wunderkind', 'market', 'EBITDA', 'ASAP', 'EOD', 'actionable', 'action', 'influencer', 'CTR', 'gamified', 'gamification', 'revenue', 'overhead'];
+  // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
+  bizzWords = ["ASAP", "B2B", "B2C", "BYOD", "CTR", "EBITDA", "EOD", "KPI", "ROI", "SEO", "SAAS", "accelerator", "action", "advertainment", "agile", "analytic", "bandwidth", "ballpark", "best practice", "blue sky thinking", "boot strap", "bootstrap", "brand", "bubble", "cash flow", "churn rate", "circle back", "client", "content marketing", "crowdfund", "crowdsource", "customer", "deep dive", "deliverable", "digital nomad", "disrupt", "downsiz", "drill down", "dynamism", "early adopter", "end-user", "end user", "enterprise", "equity", "evangelist", "evergreen", "executive", "exit strategy", "freemium", "gamification", "gamified", "globalization", "growth hack", "golden parachute", "hacking", "holistic", "hyperlocal", "ideat", "influencer", "innovat", "intellectual property", "invest", "iterat", "layoff", "leverage", "market", "millennial", "mission", "monetiz", "moving forward", "optimiz", "outsourc", "overhead", "paradigm", "pivot", "profit", "redundanc", "revenue", "sale", "scaleable", "share", "shareholder", "stakeholder", "startup", "stock", "synergy", "thought leader", "trim the fat", "unicorn", "valuation", "visionary", "wheelhouse", "wunderkind"];
   autoChatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
   currentBankruptcyStatsIndex = 38; // Current bankruptcy bonus in game.stats[]
@@ -59,7 +59,7 @@ class IdleClassAutomat {
     game.cartel.unlock()
   };
   randomBizWord() {
-    return this.autoBusinessWords[Math.floor(Math.random()*this.autoBusinessWords.length)];
+    return this.bizzWords[Math.floor(Math.random() * this.bizzWords.length)];
   };
   randomDialogue() {
     return this.autoChatPhrases[Math.floor(Math.random()*this.autoChatPhrases.length)];
