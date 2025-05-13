@@ -5,13 +5,10 @@
  * If it crashes your game, browser, machine, life.. start over ( or write your own stuff )
  */
 class IdleClassAutomat {
-  // THE FOLLOWING 6 VALUES CAN BE TWEAKED TO YOUR LIKING
-  // FEEL FREE TO TWEAK IF YOU FEEL LIKE THINGS ARE TOO SLOW
-  // Especially the bankruptcy modifier...
-  // Early on, a higher employee/upgrade spend may be desirable.
-  autocratManageLoopMillis = 2500; // Default 2500, runs an Autocrat update every 2.5 seconds
-  autocratInnerLoopMillis = 100; // Default 100, does individual Autocrat actions every 0.1 seconds
-  upgradeSpendFraction = 1.0; // Default 1.0, willing to spend 100% on upgrades, RATIO VALUE, 0.67 = 67%
+  // TODO setter
+  outerLoopMillis = 2500; // checks the game progress | every 2.5 seconds
+  innerLoopMillis = 100; // handle most of the game for you | every 0.1 seconds
+  upgradeSpendFraction = 1.0; // willing to spend 100% on upgrades | ration 0.67 = 67%
   maxAllowableRisk = 10.0; // Default 10.0%, stops R&D hiring above this risk value, PERCENTAGE VALUE, 67.0 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 0.1; // Default 0.1, makes every bankruptcy 110%, RATIO VALUE, 0.67 = 67%
@@ -380,37 +377,37 @@ class IdleClassAutomat {
       case 0: // Not running; new Autocrat state. Clear any existing loop and start pre-email loop.
         this.#currProcess = 1;
         if(this.#currProcessHandle !== 0) { clearInterval(this.#currProcessHandle); }
-        this.#currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
         if(game.locked().mail === true) { break; }
         this.#currProcess = 2;
         clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilInvestments.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilInvestments.bind(this), this.innerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
         if(game.locked().investments === true) { break; }
         this.#currProcess = 3;
         clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
         if(game.locked().research === true) { break; }
         this.#currProcess = 4;
         clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilBankruptcy.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilBankruptcy.bind(this), this.innerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
         if(game.locked().bankruptcy === true) { break; }
         this.#currProcess = 5;
         clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilAcquisitions.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilAcquisitions.bind(this), this.innerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
         if(game.locked().acquisitions === true) { break; }
         this.#currProcess = 6;
         clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilInfinity.bind(this), this.autocratInnerLoopMillis);
+        this.#currProcessHandle = setInterval(this.autoUntilInfinity.bind(this), this.innerLoopMillis);
         break;
         break;
       case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
@@ -422,7 +419,7 @@ class IdleClassAutomat {
 
   lazilyKickOffOuterLoop() {
     if(this.#currOuterProcessHandle !== 0) { clearInterval(this.#currOuterProcessHandle); }
-    this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.autocratManageLoopMillis);
+    this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
   };
 
   constructor() {
