@@ -6,8 +6,8 @@
  */
 class IdleClassAutomat {
   // TODO setter
-  outerLoopMillis = 4000; // checks the game progress | every 4 seconds
-  innerLoopMillis = 300; // handle most of the game for you | every 0.3 seconds
+  outerLoopMillis = 3300; // check the game progress | every 3.3 seconds
+  innerLoopMillis = 2200; // handle most of the game for you | every 2.2 seconds
   cashSpendOnUpgrades = 1.0; // ration 0.67 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
