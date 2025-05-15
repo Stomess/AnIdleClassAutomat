@@ -17,8 +17,6 @@ class IdleClassAutomat {
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
   autoChatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
-  currentBankruptcyStatsIndex = 38; // Current bankruptcy bonus in game.stats[]
-
   // Everything else is private
   #outerLoopId = 0;
   #currProcess = 0;
@@ -244,12 +242,27 @@ class IdleClassAutomat {
       }
     }
   };
+  // little bankruptcy-checker, to improve readability of if-statements
+  helper = {
+    firstBiz: function() { return 0 === game.bankruptcies.val() },
+    secondBiz: function() { return 1 === game.bankruptcies.val() },
+    anyOtherBiz: function() { return 2 >= game.bankruptcies.val() },
+    bonusLess: function( ref ) { return ref > game.nextBankruptcyBonus.val() },
+    bonusLessConfig: function( setup ) { return this.bonusLess( setup * game.stats[38].val() ) }
+  };
+  /* i strongly suggest to always check out from the first game as soon as possible
+   * as this unlocks goals ( wich further increases the multiplier )
+   */
   autoBankruptcy() {
-    // i suggest always check out from the first game as soon as possible | as this unlocks goals ( wich further increases the multiplier )
-    if( game.bankruptcies.val() === 0 || game.nextBankruptcyBonus.val() > game.stats[this.currentBankruptcyStatsIndex].val() * this.bankruptcyResetFraction ) {
-      this.#currProcess = 0;
-      game.restartGame();
-    }
+    if( this.helper.firstBiz() && this.helper.bonusLess(1.0) ) return; // secure an achievement
+    if( this.helper.secondBiz() && this.helper.bonusLess(8.0) ) return; // secure another achievement
+    // TODO swap that piece of equipment with setting and checking goals !!
+    if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return;
+
+    this.clearBothIntervals();
+    game.restartGame();
+    this.#currProcess = 0;
+    this.lazilyKickOffOuterLoop()
   };
   autoMicromanage() {
     for (let i = game.activeAcquisitions().length - 1; i >= 0; i--) {
