@@ -20,9 +20,9 @@ class IdleClassAutomat {
   currentBankruptcyStatsIndex = 38; // Current bankruptcy bonus in game.stats[]
 
   // Everything else is private
-  #currOuterProcessHandle = 0;
+  #outerLoopId = 0;
   #currProcess = 0;
-  #currProcessHandle = 0;
+  #innerLoopId = 0;
   #currUpgrade;
   #currEmployee;
   #currMail;
@@ -354,38 +354,38 @@ class IdleClassAutomat {
     switch(this.#currProcess) {
       case 0: // Not running; new Autocrat state. Clear any existing loop and start pre-email loop.
         this.#currProcess = 1;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
         if(game.locked().mail === true) { break; }
         this.#currProcess = 2;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilInvestments.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilInvestments.bind(this), this.innerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
         if(game.locked().investments === true) { break; }
         this.#currProcess = 3;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
         if(game.locked().research === true) { break; }
         this.#currProcess = 4;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilBankruptcy.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilBankruptcy.bind(this), this.innerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
         if(game.locked().bankruptcy === true) { break; }
         this.#currProcess = 5;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilAcquisitions.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilAcquisitions.bind(this), this.innerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
         if(game.locked().acquisitions === true) { break; }
         this.#currProcess = 6;
-        clearInterval(this.#currProcessHandle);
-        this.#currProcessHandle = setInterval(this.autoUntilInfinity.bind(this), this.innerLoopMillis);
+        clearInterval(this.#innerLoopId);
+        this.#innerLoopId = setInterval(this.autoUntilInfinity.bind(this), this.innerLoopMillis);
         break;
         break;
       case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
@@ -396,13 +396,13 @@ class IdleClassAutomat {
   };
 
   lazilyKickOffOuterLoop() {
-    clearInterval(this.#currOuterProcessHandle);
-    this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
+    clearInterval(this.#outerLoopId);
+    this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
   };
 
   clearBothIntervals() {
-    clearInterval(this.#currOuterProcessHandle);
-    clearInterval(this.#currProcessHandle)
+    clearInterval(this.#outerLoopId);
+    clearInterval(this.#innerLoopId)
   }
 
   constructor() {
