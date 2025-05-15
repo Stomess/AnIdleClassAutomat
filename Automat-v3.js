@@ -400,8 +400,15 @@ class IdleClassAutomat {
     this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
   };
 
+  clearBothIntervals() {
+    clearInterval(this.#currOuterProcessHandle);
+    clearInterval(this.#currProcessHandle)
+  }
+
   constructor() {
-    this.lazilyKickOffOuterLoop()
+    this.lazilyKickOffOuterLoop();
+    // IF sht goes sideways, you can't even read the error messages, as they might fly-in 10 times a second on the browser console
+    window.onerror = this.clearBothIntervals.bind(this);
   }
 }
 
