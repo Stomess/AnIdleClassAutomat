@@ -354,7 +354,7 @@ class IdleClassAutomat {
     switch(this.#currProcess) {
       case 0: // Not running; new Autocrat state. Clear any existing loop and start pre-email loop.
         this.#currProcess = 1;
-        if(this.#currProcessHandle !== 0) { clearInterval(this.#currProcessHandle); }
+        clearInterval(this.#currProcessHandle);
         this.#currProcessHandle = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
@@ -396,7 +396,7 @@ class IdleClassAutomat {
   };
 
   lazilyKickOffOuterLoop() {
-    if(this.#currOuterProcessHandle !== 0) { clearInterval(this.#currOuterProcessHandle); }
+    clearInterval(this.#currOuterProcessHandle);
     this.#currOuterProcessHandle = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
   };
 
