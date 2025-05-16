@@ -21,15 +21,7 @@ class IdleClassAutomat {
   #outerLoopId = 0;
   #gameState = 0;
   #innerLoopId = 0;
-  #currUpgrade;
-  #currEmployee;
-  #currMail;
-  #currOutgoing;
   #outgoingMailDelay = 0;
-  #invBought;
-  #invChecks;
-  #invTargetMins;
-  #invTargetMs;
   #invFoundTarget;
   #invSorted;
   #invAcquired;
@@ -72,9 +64,9 @@ class IdleClassAutomat {
       game.buyAllUpgrades()
     } else {
       for(let i = 0; i < game.availableUpgrades().length; i++) {
-        this.#currUpgrade = game.availableUpgrades()[i];
-        if(this.#currUpgrade.price.val() < (game.currentCash.val() * this.cashSpendOnUpgrades)) {
-          this.#currUpgrade.buy()
+        let upgr = game.availableUpgrades()[i];
+        if(upgr.price.val() < (game.currentCash.val() * this.cashSpendOnUpgrades)) {
+          upgr.buy()
         }
       }
     }
@@ -82,16 +74,16 @@ class IdleClassAutomat {
   buyStaff() {
     // reverse the loop | in favour of more "productive" units
     for(let i = 11; i >= 0; i--) {
-      this.#currEmployee = game.units.peek()[i];
+      let employee = game.units.peek()[i];
       // No cheating, Sir (:
-      if(!this.#currEmployee.available()) continue
+      if(!employee.available()) continue
       // Based on current share of total income
-      let fairShare = parseFloat(this.#currEmployee.shareOfTotal()) / 100;
+      let fairShare = parseFloat(employee.shareOfTotal()) / 100;
       // ( if possible ) always buy til first 5 | to activate next higher unit
-      if(this.#currEmployee.num.val() <= 4 && (this.#currEmployee.price.val() <= game.currentCash.val())) {
-        this.#currEmployee.buy()
-      } else if(this.#currEmployee.price.val() < (game.currentCash.val() * fairShare)) {
-        this.#currEmployee.buy()
+      if(employee.num.val() <= 4 && (employee.price.val() <= game.currentCash.val())) {
+        employee.buy()
+      } else if(employee.price.val() < (game.currentCash.val() * fairShare)) {
+        employee.buy()
       }
     }
   }
@@ -99,26 +91,26 @@ class IdleClassAutomat {
     this.outgoingMail();
     // Automatically replies to emails with "<sender_name>: <string_of_biz_babble>"
     for(let i = game.mail().length - 1; i >= 0; i--) {
-      this.#currMail = game.mail()[i];
+      let email = game.mail()[i];
       // EMAIL CHEAT: You can uncomment the following line to exploit emails
-      if(this.#currMail.replied() === true) continue
-      this.#currMail.inputText(this.#currMail.from + ",");
-      while(this.#currMail.inputText().length < 180) {
-        this.#currMail.inputText(this.#currMail.inputText() + " " + this.randomBizWord())
+      if(email.replied() === true) continue
+      email.inputText(email.from + ",");
+      while(email.inputText().length < 180) {
+        email.inputText(email.inputText() + " " + this.randomBizWord())
       }
       // Uncomment to catch what these actually are in console, for funsies :)
-      //console.log("" + this.#currMail.inputText());
-      this.#currMail.respond()
+      //console.log("" + email.inputText());
+      email.respond()
     }
   }
   outgoingMail() {
     // Send random emails to departments unless stress is above 50% (then spam to HR)
     if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.#outgoingMailDelay === 0) {
       this.#outgoingMailDelay = 1;
-      this.#currOutgoing = game.composedMail();
-      if(this.#currOutgoing.stressLevel.val() > 50) {
+      let outgoing = game.composedMail();
+      if(outgoing.stressLevel.val() > 50) {
         // Human Resources
-        this.#currOutgoing.selectedDepartment('4')
+        outgoing.selectedDepartment('4')
       } else {
         // Random other. 0 = investments, 1 = r&d, 2 = acquisitions. R&D is available before investments.
         let r = Math.random();
@@ -126,14 +118,14 @@ class IdleClassAutomat {
         if(game.activeInvestments().length === 0) r = r * 0.666
         // No investments; additionally constrain to [0...0.333], or just 1
         if(game.activeInvestments().length === 0) r = r * 0.5
-        this.#currOutgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
+        outgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
         r = Math.random();
-        this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
+        outgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
       }
-      this.#currOutgoing.to("John Wayne");
-      this.#currOutgoing.subject(this.randomDialogue());
-      while(this.#currOutgoing.message().length < 180) {
-        this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord())
+      outgoing.to("John Wayne");
+      outgoing.subject(this.randomDialogue());
+      while(outgoing.message().length < 180) {
+        outgoing.message(outgoing.message() + " " + this.randomBizWord())
       }
       setTimeout(this.sendMail, 2000);
       setTimeout(this.stopWaitingForMail, 5000)
@@ -168,41 +160,42 @@ class IdleClassAutomat {
       game.research().toggleProduction(); // back on
     }
   }
+  // TODO let's try another approach ( laytor ( maybeee ) )
   invest() {
     if(game.activeInvestments().length < game.simultaneousInvestments.val()) {
-      this.#invBought = false;
-      this.#invChecks = 0;
+      let invBought = false;
+      let invChecks = 0;
       // Check existing investment target times, fill shortest-found slot
       // Remember that target time is in milliseconds; 1 min = 60000 ms
       // Desired target times by default are 1, 12, 70, 1:59, 2:59, etc...
       // Desired percentages by default are based on number of slots
       // 1 slot = 50%, 2 = 40%, 3 = 30%, 4 = 20%, 5+ = 10%
-      while(this.#invBought === false) {
-        this.#invTargetMins = 1;
-        this.#invTargetMs = 60000;
+      while(invBought === false) {
+        let invTargetMins = 1;
+        let invTargetMs = 60000;
         this.#invFoundTarget = false;
-        if(this.#invChecks === 1) {
-          this.#invTargetMins = 12;
-          this.#invTargetMs = 12 * 60000
+        if(invChecks === 1) {
+          invTargetMins = 12;
+          invTargetMs *= invTargetMins
         }
-        else if(this.#invChecks === 2) {
-          this.#invTargetMins = 70;
-          this.#invTargetMs = 70 * 60000
+        else if(invChecks === 2) {
+          invTargetMins = 70;
+          invTargetMs *= invTargetMins
         }
-        else if(this.#invChecks > 2) {
-          this.#invTargetMins = 59 + (60 * (this.#invChecks - 2));
-          this.#invTargetMs = this.#invTargetMins * 60000
+        else if(invChecks > 2) {
+          invTargetMins = 59 + (60 * (invChecks - 2));
+          invTargetMs *= invTargetMins
         }
         for(let i = 0; i < game.activeInvestments().length; i++) {
-          if(game.activeInvestments()[i].targetTime === this.#invTargetMs) {
+          if(game.activeInvestments()[i].targetTime === invTargetMs) {
             this.#invFoundTarget = true
           }
         }
         if(this.#invFoundTarget === true) {
-          this.#invChecks++
+          invChecks++
         } else {
-          this.#invBought = true;
-          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), this.#invTargetMins)
+          invBought = true;
+          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), invTargetMins)
         }
       }
     }
