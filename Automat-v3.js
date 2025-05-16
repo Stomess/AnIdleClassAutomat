@@ -47,71 +47,70 @@ class IdleClassAutomat {
       let pastBizName = game.pastBusinesses()[pastBizCheckIndex].name;
       if(pastBizName.startsWith("Biz#")) {
         let foundBiz = parseInt(pastBizName.substr(pastBizName.indexOf("#") + 1, pastBizName.length), 10);
-        if(foundBiz > maxKnownBusiness) maxKnownBusiness = foundBiz;
+        if(foundBiz > maxKnownBusiness) maxKnownBusiness = foundBiz
       }
     }
     game.businessName().newName("Biz#" + (maxKnownBusiness + 1));
-    game.businessName().save();
-  };
+    game.businessName().save()
+  }
   unlockCartel() {
     if( 1 === game.communityLocked.val() ) return;
     game.cartel.unlock()
-  };
+  }
   randomBizWord() {
-    return this.bizzWords[Math.floor(Math.random() * this.bizzWords.length)];
-  };
+    return this.bizzWords[Math.floor(Math.random() * this.bizzWords.length)]
+  }
   randomDialogue() {
-    return this.chatPhrases[Math.floor(Math.random()*this.chatPhrases.length)];
-  };
-
+    return this.chatPhrases[Math.floor(Math.random()*this.chatPhrases.length)]
+  }
   earnDollars() {
     game.addManualClicks();
     $(".top-click-value-display").text(game.earnedPerClick.displayVal()).fadeToggle()
-  };
+  }
   buyUpgrades() {
     if(this.cashSpendOnUpgrades >= 1.0) {
-      game.buyAllUpgrades();
+      game.buyAllUpgrades()
     } else {
       for(let i = 0; i < game.availableUpgrades().length; i++) {
         this.#currUpgrade = game.availableUpgrades()[i];
         if(this.#currUpgrade.price.val() < (game.currentCash.val() * this.cashSpendOnUpgrades)) {
-          this.#currUpgrade.buy();
+          this.#currUpgrade.buy()
         }
       }
     }
-  };
+  }
   buyStaff() {
     // reverse the loop | in favour of more "productive" units
     for(let i = 11; i >= 0; i--) {
       this.#currEmployee = game.units.peek()[i];
       // No cheating, Sir (:
-      if(!this.#currEmployee.available()) continue;
+      if(!this.#currEmployee.available()) continue
       // Based on current share of total income
       let fairShare = parseFloat(this.#currEmployee.shareOfTotal()) / 100;
       // ( if possible ) always buy til first 5 | to activate next higher unit
       if(this.#currEmployee.num.val() <= 4 && (this.#currEmployee.price.val() <= game.currentCash.val())) {
-        this.#currEmployee.buy();
+        this.#currEmployee.buy()
       } else if(this.#currEmployee.price.val() < (game.currentCash.val() * fairShare)) {
-        this.#currEmployee.buy();
+        this.#currEmployee.buy()
       }
     }
-  };
+  }
   replyMail() {
     this.outgoingMail();
     // Automatically replies to emails with "<sender_name>: <string_of_biz_babble>"
     for(let i = game.mail().length - 1; i >= 0; i--) {
       this.#currMail = game.mail()[i];
       // EMAIL CHEAT: You can uncomment the following line to exploit emails
-      if(this.#currMail.replied() === true) { continue; }
+      if(this.#currMail.replied() === true) { continue }
       this.#currMail.inputText(this.#currMail.from + ",");
       while(this.#currMail.inputText().length < 180) {
-        this.#currMail.inputText(this.#currMail.inputText() + " " + this.randomBizWord());
+        this.#currMail.inputText(this.#currMail.inputText() + " " + this.randomBizWord())
       }
       // Uncomment to catch what these actually are in console, for funsies :)
       //console.log("" + this.#currMail.inputText());
-      this.#currMail.respond();
+      this.#currMail.respond()
     }
-  };
+  }
   outgoingMail() {
     // Send random emails to departments unless stress is above 50% (then spam to HR)
     if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.#outgoingMailDelay === 0) {
@@ -119,7 +118,7 @@ class IdleClassAutomat {
       this.#currOutgoing = game.composedMail();
       if(this.#currOutgoing.stressLevel.val() > 50) {
         // Human Resources
-        this.#currOutgoing.selectedDepartment('4');
+        this.#currOutgoing.selectedDepartment('4')
       } else {
         // Random other. 0 = investments, 1 = r&d, 2 = acquisitions. R&D is available before investments.
         let r = Math.random();
@@ -129,23 +128,23 @@ class IdleClassAutomat {
         if(game.activeInvestments().length === 0) { r = r * 0.5; }
         this.#currOutgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
         r = Math.random();
-        this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
+        this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
       }
       this.#currOutgoing.to("John Wayne");
       this.#currOutgoing.subject(this.randomDialogue());
       while(this.#currOutgoing.message().length < 180) {
-        this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord());
+        this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord())
       }
       setTimeout(this.sendMail, 2000);
-      setTimeout(this.stopWaitingForMail, 5000);
+      setTimeout(this.stopWaitingForMail, 5000)
     }
   }
   sendMail() {
     game.composedMail().send();
-  };
+  }
   stopWaitingForMail() {
     _ica.#outgoingMailDelay = 0;
-  };
+  }
   // little r&d-helper | to improve readability of if-statement
   more(dict, offset = 10) {
     let name = Object.keys(dict)[0];
@@ -168,7 +167,7 @@ class IdleClassAutomat {
       game.research().assignMax();
       game.research().toggleProduction(); // back on
     }
-  };
+  }
   invest() {
     if(game.activeInvestments().length < game.simultaneousInvestments.val()) {
       this.#invBought = false;
@@ -184,30 +183,30 @@ class IdleClassAutomat {
         this.#invFoundTarget = false;
         if(this.#invChecks === 1) {
           this.#invTargetMins = 12;
-          this.#invTargetMs = 12 * 60000;
+          this.#invTargetMs = 12 * 60000
         }
         else if(this.#invChecks === 2) {
           this.#invTargetMins = 70;
-          this.#invTargetMs = 70 * 60000;
+          this.#invTargetMs = 70 * 60000
         }
         else if(this.#invChecks > 2) {
           this.#invTargetMins = 59 + (60 * (this.#invChecks - 2));
-          this.#invTargetMs = this.#invTargetMins * 60000;
+          this.#invTargetMs = this.#invTargetMins * 60000
         }
         for(let i = 0; i < game.activeInvestments().length; i++) {
           if(game.activeInvestments()[i].targetTime === this.#invTargetMs) {
-            this.#invFoundTarget = true;
+            this.#invFoundTarget = true
           }
         }
         if(this.#invFoundTarget === true) {
-          this.#invChecks++;
+          this.#invChecks++
         } else {
           this.#invBought = true;
-          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), this.#invTargetMins);
+          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), this.#invTargetMins)
         }
       }
     }
-  };
+  }
   divest() {
     if(game.pendingInvestmentCount.val() > 0) {
       for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
@@ -223,25 +222,25 @@ class IdleClassAutomat {
             for(let j = 0; j < this.#invSorted.length; j++) {
               if(this.#invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
                 this.#invAcquired = true;
-                break;
+                break
               } else if(this.#invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
-                break;
+                break
               }
             }
             if(this.#invAcquired === false) {
-              game.activeInvestments()[i].handlePayout();
+              game.activeInvestments()[i].handlePayout()
             } else {
-              game.activeInvestments()[i].handleAcquisition();
+              game.activeInvestments()[i].handleAcquisition()
             }
           } else if(game.pendingAcquisitionCount.val() === 0) {
             // ONLY pay out if there ISN'T a currently-pending acquisition.
             // If an acquisition is actively paying out, do nothing, simply wait.
-            game.activeInvestments()[i].handlePayout();
+            game.activeInvestments()[i].handlePayout()
           }
         }
       }
     }
-  };
+  }
   // little bankruptcy-checker, to improve readability of if-statements
   helper = {
     firstBiz: function() { return 0 === game.bankruptcies.val() },
@@ -249,7 +248,7 @@ class IdleClassAutomat {
     anyOtherBiz: function() { return 2 >= game.bankruptcies.val() },
     bonusLess: function( ref ) { return ref > game.nextBankruptcyBonus.val() },
     bonusLessConfig: function( setup ) { return this.bonusLess( setup * game.stats[38].val() ) }
-  };
+  }
   /* i strongly suggest to always check out from the first game as soon as possible
    * as this unlocks goals ( wich further increases the multiplier )
    */
@@ -263,73 +262,68 @@ class IdleClassAutomat {
     game.restartGame();
     this.#currProcess = 0;
     this.lazilyKickOffOuterLoop()
-  };
+  }
   microManage() {
     for (let i = game.activeAcquisitions().length - 1; i >= 0; i--) {
       this.#currAcq = game.activeAcquisitions()[i];
       // Acquisition Clicker
       this.#currAcq.fire();
-
       // Acquisition Assign
       if(this.#currAcq.currentEmployees.val() > this.#currAcq.initialEmployees * this.acquisitionStopHiringFraction) {
         for(let j = 0; j < this.#currAcq.workers().length; j++) {
           this.#acqCurrWorker = this.#currAcq.workers()[j];
           if(this.#acqCurrWorker.price.val() < game.currentCash.val()) {
-            this.#acqCurrWorker.hire();
+            this.#acqCurrWorker.hire()
           }
         }
       }
-
       // Acquisition Chat
       // The cleanest way to handle these is by using the document elements.
       for(let j = this.#currAcq.chats().length - 1; j >= 0; j--) {
         this.#acqCurrChat = this.#currAcq.chats()[j];
         if(this.#acqCurrChat.finished() === true) {
-          this.#acqCurrChat.close();
+          this.#acqCurrChat.close()
         } else if(this.#acqCurrChat.messages().length > 0 && this.#acqCurrChat.messages()[this.#acqCurrChat.messages().length - 1].source !== "You") {
           this.#acqCurrChat.select();
           document.getElementById('chat-response').value = this.#acqCurrChat.name + this.randomDialogue();
-          document.getElementsByClassName("chat-submit")[0].click();
+          document.getElementsByClassName("chat-submit")[0].click()
         }
       }
-
       // Acquisition Policy
       for(let j = this.#currAcq.mail().length - 1; j >= 0; j--) {
         this.#acqCurrMail = this.#currAcq.mail()[j];
         if(this.#acqCurrMail.replied() === true) { continue; }
         this.#acqCurrMail.inputText(this.#acqCurrMail.from + ",");
         while(this.#acqCurrMail.inputText().length < 180) {
-          this.#acqCurrMail.inputText(this.#acqCurrMail.inputText() + " " + this.randomBizWord());
+          this.#acqCurrMail.inputText(this.#acqCurrMail.inputText() + " " + this.randomBizWord())
         }
-        this.#acqCurrMail.respond();
+        this.#acqCurrMail.respond()
       }
-
       // Acquisition Sell
       if(this.#currAcq.sold() === false && this.#currAcq.currentEmployees.val() === 0) {
-        this.#currAcq.sell();
+        this.#currAcq.sell()
       }
     }
-  };
-
+  }
   untilEmails() {
     this.earnDollars();
     this.buyUpgrades();
-    this.buyStaff();
-  };
+    this.buyStaff()
+  }
   untilInvestments() {
     this.earnDollars();
     this.buyUpgrades();
     this.buyStaff();
-    this.replyMail();
-  };
+    this.replyMail()
+  }
   untilResearchAndDevelopment() {
     this.earnDollars();
     this.buyUpgrades();
     this.buyStaff();
     this.replyMail();
     this.invest();
-    this.divest();
-  };
+    this.divest()
+  }
   untilBankruptcy() {
     this.earnDollars();
     this.buyUpgrades();
@@ -337,8 +331,8 @@ class IdleClassAutomat {
     this.replyMail();
     this.invest();
     this.divest();
-    this.doScience();
-  };
+    this.doScience()
+  }
   untilAcquisitions() {
     this.earnDollars();
     this.buyUpgrades();
@@ -347,8 +341,8 @@ class IdleClassAutomat {
     this.invest();
     this.divest();
     this.doScience();
-    this.bankruptcy();
-  };
+    this.bankruptcy()
+  }
   untilInfinity() {
     this.earnDollars();
     this.buyUpgrades();
@@ -358,9 +352,8 @@ class IdleClassAutomat {
     this.divest();
     this.doScience();
     this.bankruptcy();
-    this.microManage();
-  };
-
+    this.microManage()
+  }
   manageStateOfInnerLoop() {
     this.bizSelfNaming();
     this.unlockCartel();
@@ -406,21 +399,18 @@ class IdleClassAutomat {
       default:
         this.#currProcess = 0;
     }
-  };
-
+  }
   lazilyKickOffOuterLoop() {
     clearInterval(this.#outerLoopId);
-    this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis);
-  };
-
+    this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis)
+  }
   clearBothIntervals() {
     clearInterval(this.#outerLoopId);
     clearInterval(this.#innerLoopId)
   }
-
   constructor() {
     this.lazilyKickOffOuterLoop();
     // IF sht goes sideways, you can't even read the error messages, as they might fly-in 10 times a second on the browser console
-    window.onerror = this.clearBothIntervals.bind(this);
+    window.onerror = this.clearBothIntervals.bind(this)
   }
 }; let _ica = new IdleClassAutomat()
