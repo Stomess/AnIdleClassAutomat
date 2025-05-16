@@ -17,18 +17,10 @@ class IdleClassAutomat {
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
   chatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
-  // Everything else is private
   #outerLoopId = 0;
   #gameState = 0;
   #innerLoopId = 0;
   #outgoingMailDelay = 0;
-  #invFoundTarget;
-  #invSorted;
-  #invAcquired;
-  #currAcq;
-  #acqCurrWorker;
-  #acqCurrChat;
-  #acqCurrMail;
 
   bizSelfNaming() {
     if(game.businessName().name() !== "Unnamed Business") return;
@@ -112,7 +104,7 @@ class IdleClassAutomat {
         // Human Resources
         outgoing.selectedDepartment('4')
       } else {
-        // Random other. 0 = investments, 1 = r&d, 2 = acquisitions. R&D is available before investments.
+        // Random other. 0 = investments, 1 = r&d, 2 = acquisitions
         let r = Math.random();
         // No acquisitions; constrain to [0...0.666], or 1 or 0
         if(game.activeInvestments().length === 0) r = r * 0.666
@@ -173,7 +165,7 @@ class IdleClassAutomat {
       while(invBought === false) {
         let invTargetMins = 1;
         let invTargetMs = 60000;
-        this.#invFoundTarget = false;
+        let invFoundTarget = false;
         if(invChecks === 1) {
           invTargetMins = 12;
           invTargetMs *= invTargetMins
@@ -188,10 +180,10 @@ class IdleClassAutomat {
         }
         for(let i = 0; i < game.activeInvestments().length; i++) {
           if(game.activeInvestments()[i].targetTime === invTargetMs) {
-            this.#invFoundTarget = true
+            invFoundTarget = true
           }
         }
-        if(this.#invFoundTarget === true) {
+        if(invFoundTarget === true) {
           invChecks++
         } else {
           invBought = true;
@@ -209,18 +201,18 @@ class IdleClassAutomat {
           if(game.locked().acquisitions === false && game.simultaneousInvestments.val() > 1 && game.activeAcquisitions().length < game.simultaneousAcquisitions.val()) {
             // Only acquire investments if some better investment is not closer to completion than
             // half of the finished investment's original target time.
-            this.#invSorted = game.activeInvestments().slice();
-            this.#invAcquired = false;
-            this.#invSorted.sort(function(a, b){return b.targetTime - a.targetTime});
-            for(let j = 0; j < this.#invSorted.length; j++) {
-              if(this.#invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
-                this.#invAcquired = true;
+            let invSorted = game.activeInvestments().slice();
+            let invAcquired = false;
+            invSorted.sort(function(a, b){ return b.targetTime - a.targetTime });
+            for(let j = 0; j < invSorted.length; j++) {
+              if(invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
+                invAcquired = true;
                 break
-              } else if(this.#invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
+              } else if(invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
                 break
               }
             }
-            if(this.#invAcquired === false) {
+            if(invAcquired === false) {
               game.activeInvestments()[i].handlePayout()
             } else {
               game.activeInvestments()[i].handleAcquisition()
@@ -256,46 +248,45 @@ class IdleClassAutomat {
     this.#gameState = 0;
     this.lazilyKickOffOuterLoop()
   }
+  // TODO rework that as well
   microManage() {
-    for (let i = game.activeAcquisitions().length - 1; i >= 0; i--) {
-      this.#currAcq = game.activeAcquisitions()[i];
-      // Acquisition Clicker
-      this.#currAcq.fire();
-      // Acquisition Assign
-      if(this.#currAcq.currentEmployees.val() > this.#currAcq.initialEmployees * this.acquisitionStopHiringFraction) {
-        for(let j = 0; j < this.#currAcq.workers().length; j++) {
-          this.#acqCurrWorker = this.#currAcq.workers()[j];
-          if(this.#acqCurrWorker.price.val() < game.currentCash.val()) {
-            this.#acqCurrWorker.hire()
-          }
-        }
+    if( 0 === game.activeAcquisitions().length ) return
+    let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
+    acquisition.fire(); // firing people acquires net value
+    // Acquisition Assign
+    if(acquisition.currentEmployees.val() > acquisition.initialEmployees * this.acquisitionStopHiringFraction) {
+      for(let j = 0; j < acquisition.workers().length; j++) {
+        let acqWorker = acquisition.workers()[j];
+        // TODO in the current game version, you buy acquisition-workers from the above mentioned net value !!
+        if(acqWorker.price.val() < game.currentCash.val()) acqWorker.hire()
       }
-      // Acquisition Chat
-      // The cleanest way to handle these is by using the document elements.
-      for(let j = this.#currAcq.chats().length - 1; j >= 0; j--) {
-        this.#acqCurrChat = this.#currAcq.chats()[j];
-        if(this.#acqCurrChat.finished() === true) {
-          this.#acqCurrChat.close()
-        } else if(this.#acqCurrChat.messages().length > 0 && this.#acqCurrChat.messages()[this.#acqCurrChat.messages().length - 1].source !== "You") {
-          this.#acqCurrChat.select();
-          document.getElementById('chat-response').value = this.#acqCurrChat.name + this.randomDialogue();
-          document.getElementsByClassName("chat-submit")[0].click()
-        }
+    }
+    // Acquisition Chat
+    for(let j = acquisition.chats().length - 1; j >= 0; j--) {
+      let acqChat = acquisition.chats()[j];
+      if(acqChat.finished() === true) {
+        acqChat.close()
+      } else if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
+        acqChat.select();
+        // The cleanest way to handle these is by using the document elements
+        document.getElementById('chat-response').value = acqChat.name + this.randomDialogue();
+        document.getElementsByClassName("chat-submit")[0].click()
+        // TODO ( example ) $("#chat-response") etc.
       }
-      // Acquisition Policy
-      for(let j = this.#currAcq.mail().length - 1; j >= 0; j--) {
-        this.#acqCurrMail = this.#currAcq.mail()[j];
-        if(this.#acqCurrMail.replied() === true) continue
-        this.#acqCurrMail.inputText(this.#acqCurrMail.from + ",");
-        while(this.#acqCurrMail.inputText().length < 180) {
-          this.#acqCurrMail.inputText(this.#acqCurrMail.inputText() + " " + this.randomBizWord())
-        }
-        this.#acqCurrMail.respond()
+    }
+    // Acquisition Policy
+    for(let j = acquisition.mail().length - 1; j >= 0; j--) {
+      let acqMail = acquisition.mail()[j];
+      if(acqMail.replied() === true) continue
+      acqMail.inputText(acqMail.from + ",");
+      while(acqMail.inputText().length < 180) {
+        acqMail.inputText(acqMail.inputText() + " " + this.randomBizWord())
       }
-      // Acquisition Sell
-      if(this.#currAcq.sold() === false && this.#currAcq.currentEmployees.val() === 0) {
-        this.#currAcq.sell()
-      }
+      acqMail.respond()
+    }
+    // Acquisition Sell
+    if(acquisition.sold() === false && acquisition.currentEmployees.val() === 0) {
+      acquisition.sell()
     }
   }
   untilEmails() {
