@@ -19,7 +19,7 @@ class IdleClassAutomat {
 
   // Everything else is private
   #outerLoopId = 0;
-  #currProcess = 0;
+  #gameState = 0;
   #innerLoopId = 0;
   #currUpgrade;
   #currEmployee;
@@ -260,7 +260,7 @@ class IdleClassAutomat {
 
     this.clearBothIntervals();
     game.restartGame();
-    this.#currProcess = 0;
+    this.#gameState = 0;
     this.lazilyKickOffOuterLoop()
   }
   microManage() {
@@ -357,39 +357,39 @@ class IdleClassAutomat {
   manageStateOfInnerLoop() {
     this.bizSelfNaming();
     this.unlockCartel();
-    switch(this.#currProcess) {
+    switch(this.#gameState) {
       case 0: // freshly started biz | clear any existing loop and start pre-email loop
-        this.#currProcess = 1;
+        this.#gameState = 1;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
         if(game.locked().mail === true) break
-        this.#currProcess = 2;
+        this.#gameState = 2;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
         if(game.locked().investments === true) break
-        this.#currProcess = 3;
+        this.#gameState = 3;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
         if(game.locked().research === true) break
-        this.#currProcess = 4;
+        this.#gameState = 4;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
         if(game.locked().bankruptcy === true) break
-        this.#currProcess = 5;
+        this.#gameState = 5;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
         if(game.locked().acquisitions === true) break
-        this.#currProcess = 6;
+        this.#gameState = 6;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
         break;
@@ -397,7 +397,7 @@ class IdleClassAutomat {
       case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
         break;
       default:
-        this.#currProcess = 0;
+        this.#gameState = 0;
     }
   }
   lazilyKickOffOuterLoop() {
