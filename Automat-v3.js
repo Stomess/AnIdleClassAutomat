@@ -20,8 +20,8 @@ class IdleClassAutomat {
   #outerLoopId = 0;
   #innerLoopId = 0;
   #outgoingMailDelay = 0;
-  const #gameState = {
-    _current,
+  #gameState = {
+    _current: -2,
     freshStart: 0,
     waitMail: 1,
     waitInvest: 2,
