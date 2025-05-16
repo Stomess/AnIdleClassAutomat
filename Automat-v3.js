@@ -101,7 +101,7 @@ class IdleClassAutomat {
     for(let i = game.mail().length - 1; i >= 0; i--) {
       this.#currMail = game.mail()[i];
       // EMAIL CHEAT: You can uncomment the following line to exploit emails
-      if(this.#currMail.replied() === true) { continue }
+      if(this.#currMail.replied() === true) continue
       this.#currMail.inputText(this.#currMail.from + ",");
       while(this.#currMail.inputText().length < 180) {
         this.#currMail.inputText(this.#currMail.inputText() + " " + this.randomBizWord())
@@ -123,9 +123,9 @@ class IdleClassAutomat {
         // Random other. 0 = investments, 1 = r&d, 2 = acquisitions. R&D is available before investments.
         let r = Math.random();
         // No acquisitions; constrain to [0...0.666], or 1 or 0
-        if(game.activeInvestments().length === 0) { r = r * 0.666; }
+        if(game.activeInvestments().length === 0) r = r * 0.666
         // No investments; additionally constrain to [0...0.333], or just 1
-        if(game.activeInvestments().length === 0) { r = r * 0.5; }
+        if(game.activeInvestments().length === 0) r = r * 0.5
         this.#currOutgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
         r = Math.random();
         this.#currOutgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
@@ -140,10 +140,10 @@ class IdleClassAutomat {
     }
   }
   sendMail() {
-    game.composedMail().send();
+    game.composedMail().send()
   }
   stopWaitingForMail() {
-    _ica.#outgoingMailDelay = 0;
+    _ica.#outgoingMailDelay = 0
   }
   // little r&d-helper | to improve readability of if-statement
   more(dict, offset = 10) {
@@ -253,10 +253,10 @@ class IdleClassAutomat {
    * as this unlocks goals ( wich further increases the multiplier )
    */
   bankruptcy() {
-    if( this.helper.firstBiz() && this.helper.bonusLess(1.0) ) return; // secure an achievement
-    if( this.helper.secondBiz() && this.helper.bonusLess(8.0) ) return; // secure another achievement
+    if( this.helper.firstBiz() && this.helper.bonusLess(1.0) ) return // secure an achievement
+    if( this.helper.secondBiz() && this.helper.bonusLess(8.0) ) return // secure another achievement
     // TODO swap that piece of equipment with setting and checking goals !!
-    if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return;
+    if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
     this.clearBothIntervals();
     game.restartGame();
@@ -292,7 +292,7 @@ class IdleClassAutomat {
       // Acquisition Policy
       for(let j = this.#currAcq.mail().length - 1; j >= 0; j--) {
         this.#acqCurrMail = this.#currAcq.mail()[j];
-        if(this.#acqCurrMail.replied() === true) { continue; }
+        if(this.#acqCurrMail.replied() === true) continue
         this.#acqCurrMail.inputText(this.#acqCurrMail.from + ",");
         while(this.#acqCurrMail.inputText().length < 180) {
           this.#acqCurrMail.inputText(this.#acqCurrMail.inputText() + " " + this.randomBizWord())
@@ -364,31 +364,31 @@ class IdleClassAutomat {
         this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
-        if(game.locked().mail === true) { break; }
+        if(game.locked().mail === true) break
         this.#currProcess = 2;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
-        if(game.locked().investments === true) { break; }
+        if(game.locked().investments === true) break
         this.#currProcess = 3;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
-        if(game.locked().research === true) { break; }
+        if(game.locked().research === true) break
         this.#currProcess = 4;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
-        if(game.locked().bankruptcy === true) { break; }
+        if(game.locked().bankruptcy === true) break
         this.#currProcess = 5;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
-        if(game.locked().acquisitions === true) { break; }
+        if(game.locked().acquisitions === true) break
         this.#currProcess = 6;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
