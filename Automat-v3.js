@@ -15,7 +15,7 @@ class IdleClassAutomat {
   // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
   bizzWords = ["ASAP", "B2B", "B2C", "BYOD", "CTR", "EBITDA", "EOD", "KPI", "ROI", "SEO", "SAAS", "accelerator", "action", "advertainment", "agile", "analytic", "bandwidth", "ballpark", "best practice", "blue sky thinking", "boot strap", "bootstrap", "brand", "bubble", "cash flow", "churn rate", "circle back", "client", "content marketing", "crowdfund", "crowdsource", "customer", "deep dive", "deliverable", "digital nomad", "disrupt", "downsiz", "drill down", "dynamism", "early adopter", "end-user", "end user", "enterprise", "equity", "evangelist", "evergreen", "executive", "exit strategy", "freemium", "gamification", "gamified", "globalization", "growth hack", "golden parachute", "hacking", "holistic", "hyperlocal", "ideat", "influencer", "innovat", "intellectual property", "invest", "iterat", "layoff", "leverage", "market", "millennial", "mission", "monetiz", "moving forward", "optimiz", "outsourc", "overhead", "paradigm", "pivot", "profit", "redundanc", "revenue", "sale", "scaleable", "share", "shareholder", "stakeholder", "startup", "stock", "synergy", "thought leader", "trim the fat", "unicorn", "valuation", "visionary", "wheelhouse", "wunderkind"];
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
-  autoChatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
+  chatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
   // Everything else is private
   #outerLoopId = 0;
@@ -45,12 +45,12 @@ class IdleClassAutomat {
     while(pastBizCheckIndex < game.pastBusinesses().length - 1) {
       pastBizCheckIndex = pastBizCheckIndex + 1;
       let pastBizName = game.pastBusinesses()[pastBizCheckIndex].name;
-      if(pastBizName.startsWith("AutoBiz#")) {
+      if(pastBizName.startsWith("Biz#")) {
         let foundBiz = parseInt(pastBizName.substr(pastBizName.indexOf("#") + 1, pastBizName.length), 10);
         if(foundBiz > maxKnownBusiness) maxKnownBusiness = foundBiz;
       }
     }
-    game.businessName().newName("AutoBiz#" + (maxKnownBusiness + 1));
+    game.businessName().newName("Biz#" + (maxKnownBusiness + 1));
     game.businessName().save();
   };
   unlockCartel() {
@@ -61,14 +61,14 @@ class IdleClassAutomat {
     return this.bizzWords[Math.floor(Math.random() * this.bizzWords.length)];
   };
   randomDialogue() {
-    return this.autoChatPhrases[Math.floor(Math.random()*this.autoChatPhrases.length)];
+    return this.chatPhrases[Math.floor(Math.random()*this.chatPhrases.length)];
   };
 
-  autoEarnDollars() {
+  earnDollars() {
     game.addManualClicks();
     $(".top-click-value-display").text(game.earnedPerClick.displayVal()).fadeToggle()
   };
-  autoUpgrade() {
+  buyUpgrades() {
     if(this.cashSpendOnUpgrades >= 1.0) {
       game.buyAllUpgrades();
     } else {
@@ -80,7 +80,7 @@ class IdleClassAutomat {
       }
     }
   };
-  autoHR() {
+  buyStaff() {
     // reverse the loop | in favour of more "productive" units
     for(let i = 11; i >= 0; i--) {
       this.#currEmployee = game.units.peek()[i];
@@ -96,8 +96,8 @@ class IdleClassAutomat {
       }
     }
   };
-  autoMail() {
-    this.autoOutgoingMail();
+  replyMail() {
+    this.outgoingMail();
     // Automatically replies to emails with "<sender_name>: <string_of_biz_babble>"
     for(let i = game.mail().length - 1; i >= 0; i--) {
       this.#currMail = game.mail()[i];
@@ -112,7 +112,7 @@ class IdleClassAutomat {
       this.#currMail.respond();
     }
   };
-  autoOutgoingMail() {
+  outgoingMail() {
     // Send random emails to departments unless stress is above 50% (then spam to HR)
     if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.#outgoingMailDelay === 0) {
       this.#outgoingMailDelay = 1;
@@ -136,14 +136,14 @@ class IdleClassAutomat {
       while(this.#currOutgoing.message().length < 180) {
         this.#currOutgoing.message(this.#currOutgoing.message() + " " + this.randomBizWord());
       }
-      setTimeout(this.autoSendMail, 2000);
-      setTimeout(this.autoStopWaitingForMail, 5000);
+      setTimeout(this.sendMail, 2000);
+      setTimeout(this.stopWaitingForMail, 5000);
     }
   }
-  autoSendMail() {
+  sendMail() {
     game.composedMail().send();
   };
-  autoStopWaitingForMail() {
+  stopWaitingForMail() {
     _ica.#outgoingMailDelay = 0;
   };
   // little r&d-helper | to improve readability of if-statement
@@ -156,9 +156,9 @@ class IdleClassAutomat {
   /* just assign fckn all
    * we will need the storage | for motivational emails #wink
    * there are good reasons to turn away from your business from time to time
-   * ( that's when you need autosell )
+   * ( that's when you need sell )
    */
-  autoScience() {
+  doScience() {
     if( game.research().patents().length > 0 ) game.research().sellPatents();
     // just preparing some real js-magic here
     let intern = 0, wage = 1, sales = 2, manager = 3; // TODO see if we can do nicer than this
@@ -169,7 +169,7 @@ class IdleClassAutomat {
       game.research().toggleProduction(); // back on
     }
   };
-  autoInvest() {
+  invest() {
     if(game.activeInvestments().length < game.simultaneousInvestments.val()) {
       this.#invBought = false;
       this.#invChecks = 0;
@@ -208,12 +208,12 @@ class IdleClassAutomat {
       }
     }
   };
-  autoDivest() {
+  divest() {
     if(game.pendingInvestmentCount.val() > 0) {
       for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
-        // Auto Sell
+        // sell
         if(game.activeInvestments()[i].timeRemaining() === 0) {
-          // Auto Acquire
+          // acquire
           if(game.locked().acquisitions === false && game.simultaneousInvestments.val() > 1 && game.activeAcquisitions().length < game.simultaneousAcquisitions.val()) {
             // Only acquire investments if some better investment is not closer to completion than
             // half of the finished investment's original target time.
@@ -253,7 +253,7 @@ class IdleClassAutomat {
   /* i strongly suggest to always check out from the first game as soon as possible
    * as this unlocks goals ( wich further increases the multiplier )
    */
-  autoBankruptcy() {
+  bankruptcy() {
     if( this.helper.firstBiz() && this.helper.bonusLess(1.0) ) return; // secure an achievement
     if( this.helper.secondBiz() && this.helper.bonusLess(8.0) ) return; // secure another achievement
     // TODO swap that piece of equipment with setting and checking goals !!
@@ -264,13 +264,13 @@ class IdleClassAutomat {
     this.#currProcess = 0;
     this.lazilyKickOffOuterLoop()
   };
-  autoMicromanage() {
+  microManage() {
     for (let i = game.activeAcquisitions().length - 1; i >= 0; i--) {
       this.#currAcq = game.activeAcquisitions()[i];
       // Acquisition Clicker
       this.#currAcq.fire();
 
-      // Acquisition AutoAssign
+      // Acquisition Assign
       if(this.#currAcq.currentEmployees.val() > this.#currAcq.initialEmployees * this.acquisitionStopHiringFraction) {
         for(let j = 0; j < this.#currAcq.workers().length; j++) {
           this.#acqCurrWorker = this.#currAcq.workers()[j];
@@ -280,7 +280,7 @@ class IdleClassAutomat {
         }
       }
 
-      // Acquisition AutoChat
+      // Acquisition Chat
       // The cleanest way to handle these is by using the document elements.
       for(let j = this.#currAcq.chats().length - 1; j >= 0; j--) {
         this.#acqCurrChat = this.#currAcq.chats()[j];
@@ -293,7 +293,7 @@ class IdleClassAutomat {
         }
       }
 
-      // Acquisition AutoPolicy
+      // Acquisition Policy
       for(let j = this.#currAcq.mail().length - 1; j >= 0; j--) {
         this.#acqCurrMail = this.#currAcq.mail()[j];
         if(this.#acqCurrMail.replied() === true) { continue; }
@@ -311,54 +311,54 @@ class IdleClassAutomat {
     }
   };
 
-  autoUntilEmails() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
+  untilEmails() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
   };
-  autoUntilInvestments() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
-    this.autoMail();
+  untilInvestments() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
   };
-  autoUntilResearchAndDevelopment() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
-    this.autoMail();
-    this.autoInvest();
-    this.autoDivest();
+  untilResearchAndDevelopment() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
   };
-  autoUntilBankruptcy() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
-    this.autoMail();
-    this.autoInvest();
-    this.autoDivest();
-    this.autoScience();
+  untilBankruptcy() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
+    this.doScience();
   };
-  autoUntilAcquisitions() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
-    this.autoMail();
-    this.autoInvest();
-    this.autoDivest();
-    this.autoScience();
-    this.autoBankruptcy();
+  untilAcquisitions() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
+    this.doScience();
+    this.bankruptcy();
   };
-  autoUntilInfinity() {
-    this.autoEarnDollars();
-    this.autoUpgrade();
-    this.autoHR();
-    this.autoMail();
-    this.autoInvest();
-    this.autoDivest();
-    this.autoScience();
-    this.autoBankruptcy();
-    this.autoMicromanage();
+  untilInfinity() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
+    this.doScience();
+    this.bankruptcy();
+    this.microManage();
   };
 
   manageStateOfInnerLoop() {
@@ -368,37 +368,37 @@ class IdleClassAutomat {
       case 0: // freshly started biz | clear any existing loop and start pre-email loop
         this.#currProcess = 1;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
         break;
       case 1: // Wait for emails before changing loop to pre-Investments loop.
         if(game.locked().mail === true) { break; }
         this.#currProcess = 2;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilInvestments.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
         break;
       case 2: // Wait for Investments before changing loop to pre-R&D loop.
         if(game.locked().investments === true) { break; }
         this.#currProcess = 3;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilResearchAndDevelopment.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break;
       case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
         if(game.locked().research === true) { break; }
         this.#currProcess = 4;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilBankruptcy.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
         break;
       case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
         if(game.locked().bankruptcy === true) { break; }
         this.#currProcess = 5;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilAcquisitions.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
         break;
       case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
         if(game.locked().acquisitions === true) { break; }
         this.#currProcess = 6;
         clearInterval(this.#innerLoopId);
-        this.#innerLoopId = setInterval(this.autoUntilInfinity.bind(this), this.innerLoopMillis);
+        this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
         break;
         break;
       case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
