@@ -255,8 +255,8 @@ class IdleClassAutomat {
     if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
     this.clearBothIntervals();
-    game.restartGame();
     this.#gameState.setBack();
+    game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
   // TODO rework that as well
@@ -350,42 +350,42 @@ class IdleClassAutomat {
     this.microManage()
   }
   manageStateOfInnerLoop() {
-    this.bizSelfNaming();
-    this.unlockCartel();
     switch(this.#gameState.current) {
       case this.#gameState.freshStart:
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
+        this.bizSelfNaming();
+        this.unlockCartel();
         this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitMail:
         if(game.locked().mail === true) break
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitInvest:
         if(game.locked().investments === true) break
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitScience:
         if(game.locked().research === true) break
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitBankrupt:
         if(game.locked().bankruptcy === true) break
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitAcq:
         if(game.locked().acquisitions === true) break
-        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitInfinit:
@@ -395,8 +395,9 @@ class IdleClassAutomat {
          */
         break
       default:
-        console.warn('.. the default switch-case | aka the inner rabit-hole ..');
-        this.#gameState.setBack()
+        clearInterval(this.#innerLoopId); // grandpa sayz: better be safe than sorry
+        this.#gameState.setBack();
+        console.warn('.. the default switch-case | aka the inner rabit-hole ..')
     }
   }
   lazilyKickOffOuterLoop() {
