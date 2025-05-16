@@ -38,7 +38,7 @@ class IdleClassAutomat {
   #acqCurrChat;
   #acqCurrMail;
 
-  autocratSelfNaming() {
+  bizSelfNaming() {
     if(game.businessName().name() !== "Unnamed Business") return;
     let pastBizCheckIndex = -1;
     let maxKnownBusiness = -1;
@@ -144,7 +144,7 @@ class IdleClassAutomat {
     game.composedMail().send();
   };
   autoStopWaitingForMail() {
-    activeIdleClassAutocrat.#outgoingMailDelay = 0;
+    _ica.#outgoingMailDelay = 0;
   };
   // little r&d-helper | to improve readability of if-statement
   more(dict, offset = 10) {
@@ -362,10 +362,10 @@ class IdleClassAutomat {
   };
 
   manageStateOfInnerLoop() {
-    this.autocratSelfNaming();
+    this.bizSelfNaming();
     this.unlockCartel();
     switch(this.#currProcess) {
-      case 0: // Not running; new Autocrat state. Clear any existing loop and start pre-email loop.
+      case 0: // freshly started biz | clear any existing loop and start pre-email loop
         this.#currProcess = 1;
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.autoUntilEmails.bind(this), this.innerLoopMillis);
@@ -423,7 +423,4 @@ class IdleClassAutomat {
     // IF sht goes sideways, you can't even read the error messages, as they might fly-in 10 times a second on the browser console
     window.onerror = this.clearBothIntervals.bind(this);
   }
-}
-
-// Actually kicks off the Autocrat.
-var activeIdleClassAutocrat = new IdleClassAutomat();
+}; let _ica = new IdleClassAutomat()
