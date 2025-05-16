@@ -18,10 +18,21 @@ class IdleClassAutomat {
   chatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
   #outerLoopId = 0;
-  #gameState = 0;
   #innerLoopId = 0;
   #outgoingMailDelay = 0;
-
+  const #gameState = {
+    _current,
+    freshStart: 0,
+    waitMail: 1,
+    waitInvest: 2,
+    waitScience: 3,
+    waitBankrupt: 4,
+    waitAcq: 5,
+    waitInfinit: 6,
+    get current() { return this._current },
+    setNext() { ++this._current },
+    setBack() { this._current = this.freshStart }
+  };
   bizSelfNaming() {
     if(game.businessName().name() !== "Unnamed Business") return;
     let pastBizCheckIndex = -1;
@@ -245,7 +256,7 @@ class IdleClassAutomat {
 
     this.clearBothIntervals();
     game.restartGame();
-    this.#gameState = 0;
+    this.#gameState.setBack();
     this.lazilyKickOffOuterLoop()
   }
   // TODO rework that as well
@@ -341,47 +352,51 @@ class IdleClassAutomat {
   manageStateOfInnerLoop() {
     this.bizSelfNaming();
     this.unlockCartel();
-    switch(this.#gameState) {
-      case 0: // freshly started biz | clear any existing loop and start pre-email loop
-        this.#gameState = 1;
+    switch(this.#gameState.current) {
+      case this.#gameState.freshStart:
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
-        break;
-      case 1: // Wait for emails before changing loop to pre-Investments loop.
+        break
+      case this.#gameState.waitMail:
         if(game.locked().mail === true) break
-        this.#gameState = 2;
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
-        break;
-      case 2: // Wait for Investments before changing loop to pre-R&D loop.
+        break
+      case this.#gameState.waitInvest:
         if(game.locked().investments === true) break
-        this.#gameState = 3;
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
-        break;
-      case 3: // Wait for R&D before changing loop to pre-Bankruptcy loop.
+        break
+      case this.#gameState.waitScience:
         if(game.locked().research === true) break
-        this.#gameState = 4;
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
-        break;
-      case 4: // Wait for Bankruptcy before changing loop to pre-Acquisitions loop
+        break
+      case this.#gameState.waitBankrupt:
         if(game.locked().bankruptcy === true) break
-        this.#gameState = 5;
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
-        break;
-      case 5: // Wait for Acquisitions before changing loop to pre-Infinity loop
+        break
+      case this.#gameState.waitAcq:
         if(game.locked().acquisitions === true) break
-        this.#gameState = 6;
+        this.#gameState.setNext();
         clearInterval(this.#innerLoopId);
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
-        break;
-        break;
-      case 6: // just fckn run forevor | until the somewhat parallel condition-check sayz something else -- or we define some nu shit to handle ( like elections )
-        break;
+        break
+      case this.#gameState.waitInfinit:
+        /* just fckn run forevor
+         * until the somewhat parallel condition-check sayz something else
+         * or we define some nu shit to handle ( like elections )
+         */
+        break
       default:
-        this.#gameState = 0;
+        console.warn('.. the default switch-case | aka the inner rabit-hole ..');
+        this.#gameState.setBack()
     }
   }
   lazilyKickOffOuterLoop() {
