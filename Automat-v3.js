@@ -241,7 +241,7 @@ class IdleClassAutomat {
   helper = {
     firstBiz: function() { return 0 === game.bankruptcies.val() },
     secondBiz: function() { return 1 === game.bankruptcies.val() },
-    anyOtherBiz: function() { return 2 >= game.bankruptcies.val() },
+    anyOtherBiz: function() { return 2 <= game.bankruptcies.val() },
     bonusLess: function( ref ) { return ref > game.nextBankruptcyBonus.val() },
     bonusLessConfig: function( setup ) { return this.bonusLess( setup * game.stats[38].val() ) }
   }
