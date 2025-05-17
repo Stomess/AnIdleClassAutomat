@@ -1,5 +1,5 @@
 "use strict";
-/* An Idle Class Automat v3.4.7
+/* An Idle Class Automat v3.5.12
  * Base structure shamelessly lended from argembarger (:
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  * If it crashes your game, browser, machine, life.. start over ( or write your own stuff )
