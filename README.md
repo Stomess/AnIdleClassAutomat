@@ -1,5 +1,3 @@
-_**IdleClassAutocrat** was initiated by Argembarger for the game <https://www.smallgraygames.com/the-idle-class>_
-
 # how to use
 1. copy the content of the js-file to your browser console ( f12 for most common internet-accesspoints )
 2. hit enter ( dummy )
