@@ -111,7 +111,7 @@ class IdleClassAutomat {
         outgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
       }
       outgoing.to("John Wayne");
-      outgoing.subject(random( this.chatPhrases ));
+      outgoing.subject("jist doit");
       while(outgoing.message().length < 180) {
         outgoing.message(outgoing.message() + " " + random( this.bizzWords ))
       }
