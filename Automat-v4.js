@@ -39,15 +39,10 @@ class IdleClassAutomat {
     game.businessName().save()
   }
   unlockCartel() {
-    if( 1 === game.communityLocked.val() ) return;
+    if( 1 === game.communityLocked.val() ) return
     game.cartel.unlock()
   }
-  randomBizWord() {
-    return this.bizzWords[Math.floor(Math.random() * this.bizzWords.length)]
-  }
-  randomDialogue() {
-    return this.chatPhrases[Math.floor(Math.random()*this.chatPhrases.length)]
-  }
+  random( array ) { return array[Math.floor(Math.random() * array.length)] }
   earnDollars() {
     game.addManualClicks();
     $(".top-click-value-display").text(game.earnedPerClick.displayVal()).fadeToggle()
@@ -89,7 +84,7 @@ class IdleClassAutomat {
       if(email.replied() === true) continue
       email.inputText(email.from + ",");
       while(email.inputText().length < 180) {
-        email.inputText(email.inputText() + " " + this.randomBizWord())
+        email.inputText(email.inputText() + " " + random( this.bizzWords ))
       }
       // Uncomment to catch what these actually are in console, for funsies :)
       //console.log("" + email.inputText());
@@ -116,9 +111,9 @@ class IdleClassAutomat {
         outgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
       }
       outgoing.to("John Wayne");
-      outgoing.subject(this.randomDialogue());
+      outgoing.subject(random( this.chatPhrases ));
       while(outgoing.message().length < 180) {
-        outgoing.message(outgoing.message() + " " + this.randomBizWord())
+        outgoing.message(outgoing.message() + " " + random( this.bizzWords ))
       }
       setTimeout(this.sendMail, 2000);
       setTimeout(this.stopWaitingForMail, 5000)
@@ -270,7 +265,7 @@ class IdleClassAutomat {
       } else if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
         acqChat.select();
         // The cleanest way to handle these is by using the document elements
-        document.getElementById('chat-response').value = acqChat.name + this.randomDialogue();
+        document.getElementById('chat-response').value = acqChat.name + random( this.chatPhrases );
         document.getElementsByClassName("chat-submit")[0].click()
         // TODO ( example ) $("#chat-response") etc.
       }
@@ -281,7 +276,7 @@ class IdleClassAutomat {
       if(acqMail.replied() === true) continue
       acqMail.inputText(acqMail.from + ",");
       while(acqMail.inputText().length < 180) {
-        acqMail.inputText(acqMail.inputText() + " " + this.randomBizWord())
+        acqMail.inputText(acqMail.inputText() + " " + random( this.bizzWords ))
       }
       acqMail.respond()
     }
