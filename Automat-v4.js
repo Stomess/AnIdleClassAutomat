@@ -51,11 +51,11 @@ class IdleClassAutomat {
     if(this.cashSpendOnUpgrades >= 1.0) {
       game.buyAllUpgrades()
     } else {
-      for(let i = 0; i < game.availableUpgrades().length; i++) {
+      // inverse the loop | for better gear ^^
+      for(let i = game.availableUpgrades().length - 1; i >= 0; i--) {
         let upgr = game.availableUpgrades()[i];
-        if(upgr.price.val() < (game.currentCash.val() * this.cashSpendOnUpgrades)) {
-          upgr.buy()
-        }
+        if( upgr.cantAfford() ) continue
+        if( upgr.price.val() < ( game.currentCash.val() * this.cashSpendOnUpgrades ) ) upgr.buy()
       }
     }
   }
