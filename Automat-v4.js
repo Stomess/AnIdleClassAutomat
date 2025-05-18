@@ -19,7 +19,7 @@ class IdleClassAutomat {
 
   #outerLoopId = 0;
   #innerLoopId = 0;
-  #outgoingMailDelay = 0;
+  #outgoingMailDelay = false;
   #gameState = {
     _current: -2,
     freshStart: 0,
@@ -32,6 +32,13 @@ class IdleClassAutomat {
     get current() { return this._current },
     setNext() { ++this._current },
     setBack() { this._current = this.freshStart }
+  };
+  #deps = {
+    inv: 0,
+    rd: 1,
+    acq: 2,
+    // 3, i guess, it's training ..
+    hr: 4
   };
   bizSelfNaming() {
     if( "Unnamed Business" !== game.businessName().name() ) return;
@@ -87,39 +94,28 @@ class IdleClassAutomat {
     }
   }
   outgoingMail() {
-    // Send random emails to departments unless stress is above 50% (then spam to HR)
-    if(game.locked().outgoingMail === false && game.composedMail().resting() === false && this.#outgoingMailDelay === 0) {
-      this.#outgoingMailDelay = 1;
-      let outgoing = game.composedMail();
-      if(outgoing.stressLevel.val() > 50) {
-        // Human Resources
-        outgoing.selectedDepartment('4')
-      } else {
-        // Random other. 0 = investments, 1 = r&d, 2 = acquisitions
-        let r = Math.random();
-        // No acquisitions; constrain to [0...0.666], or 1 or 0
-        if(game.activeInvestments().length === 0) r = r * 0.666
-        // No investments; additionally constrain to [0...0.333], or just 1
-        if(game.activeInvestments().length === 0) r = r * 0.5
-        outgoing.selectedDepartment((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'));
-        r = Math.random();
-        outgoing.selectedUrgency((r <= 0.333) ? '1' : ((r <= 0.666) ? '0' : '2'))
-      }
-      outgoing.to("John Wayne");
-      outgoing.subject("jist doit");
-      while(outgoing.message().length < 180) {
-        outgoing.message(outgoing.message() + " " + random( this.bizzWords ))
-      }
-      setTimeout(this.sendMail, 2000);
-      setTimeout(this.stopWaitingForMail, 5000)
+    if( true === game.locked().outgoingMail || true === game.composedMail().resting() ) return
+    // TODO hiliriouse .. building a five sec delay for a split sec task ..
+    if( true === this.#outgoingMailDelay ) return
+    this.#outgoingMailDelay = true;
+    let outgoing = game.composedMail();
+    if(outgoing.stressLevel.val() > 50) {
+      outgoing.selectedDepartment( this.deps.hr )
+    } else {
+      /* it really does not matter
+       * spamming an inactive department, will provoke a mailer-deamon in your inbox
+       * ( and guess what: you can reply to that .. and generate money )
+       */
+      outgoing.selectedDepartment( this.random( [ this.deps.inv, this.deps.rd, this.deps.acq ] ) );
+      outgoing.selectedUrgency( this.random( [0, 1, 2] ) )
     }
+    outgoing.to("John Wayne");
+    outgoing.subject("jist doit");
+    while( outgoing.message().length < 180 ) outgoing.message(outgoing.message() + " " + random( this.bizzWords ))
+    setTimeout(game.composedMail().send, 2000);
+    setTimeout(this.stopOutgoingDelay, 5000)
   }
-  sendMail() {
-    game.composedMail().send()
-  }
-  stopWaitingForMail() {
-    _ica.#outgoingMailDelay = 0
-  }
+  stopOutgoingDelay() { this.#outgoingMailDelay = false }
   // little r&d-helper | to improve readability of if-statement
   more(dict, offset = 10) {
     let name = Object.keys(dict)[0];
