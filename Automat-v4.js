@@ -76,18 +76,13 @@ class IdleClassAutomat {
     }
   }
   replyMail() {
-    this.outgoingMail();
-    // Automatically replies to emails with "<sender_name>: <string_of_biz_babble>"
-    for(let i = game.mail().length - 1; i >= 0; i--) {
+    this.outgoingMail(); // TODO why is this somewhat coupled
+    for( let i = game.mail().length - 1; i >= 0; i-- ) {
       let email = game.mail()[i];
-      // EMAIL CHEAT: You can uncomment the following line to exploit emails
-      if(email.replied() === true) continue
-      email.inputText(email.from + ",");
-      while(email.inputText().length < 180) {
-        email.inputText(email.inputText() + " " + random( this.bizzWords ))
-      }
-      // Uncomment to catch what these actually are in console, for funsies :)
-      //console.log("" + email.inputText());
+      if( email.replied() === true ) continue // possible cheat: uncomment that line to exploit emails
+      //email.inputText(email.from); // this really is a one-time achievement
+      while( email.inputText().length < 180 ) email.inputText( email.inputText() + " " + random( this.bizzWords ) )
+      // going biz-words only, means more cash .. i guess
       email.respond()
     }
   }
