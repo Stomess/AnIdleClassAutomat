@@ -34,18 +34,8 @@ class IdleClassAutomat {
     setBack() { this._current = this.freshStart }
   };
   bizSelfNaming() {
-    if(game.businessName().name() !== "Unnamed Business") return;
-    let pastBizCheckIndex = -1;
-    let maxKnownBusiness = -1;
-    while(pastBizCheckIndex < game.pastBusinesses().length - 1) {
-      pastBizCheckIndex = pastBizCheckIndex + 1;
-      let pastBizName = game.pastBusinesses()[pastBizCheckIndex].name;
-      if(pastBizName.startsWith("Biz#")) {
-        let foundBiz = parseInt(pastBizName.substr(pastBizName.indexOf("#") + 1, pastBizName.length), 10);
-        if(foundBiz > maxKnownBusiness) maxKnownBusiness = foundBiz
-      }
-    }
-    game.businessName().newName("Biz#" + (maxKnownBusiness + 1));
+    if( "Unnamed Business" !== game.businessName().name() ) return;
+    game.businessName().newName("no fancy biz-name #" + ( game.pastBusinesses().length + 1 ) );
     game.businessName().save()
   }
   unlockCartel() {
