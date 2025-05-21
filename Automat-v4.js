@@ -8,7 +8,6 @@ class IdleClassAutomat {
   outerLoopMillis = 4400; // check the game progress | every 4.4 seconds
   innerLoopMillis = 800; // handle most of the game for you | every 0.8 seconds
   cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
-  acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
   // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
@@ -201,20 +200,17 @@ class IdleClassAutomat {
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
-  // TODO rework that as well
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
+    if( 1 = game.pendingAcquisitionCount.val() ) return acquisition.sell()
+
     acquisition.fire(); // firing people acquires net value
-    // Acquisition Assign
-    if(acquisition.currentEmployees.val() > acquisition.initialEmployees * this.acquisitionStopHiringFraction) {
-      for(let j = 0; j < acquisition.workers().length; j++) {
-        let acqWorker = acquisition.workers()[j];
-        // TODO in the current game version, you buy acquisition-workers from the above mentioned net value !!
-        if(acqWorker.price.val() < game.currentCash.val()) acqWorker.hire()
-      }
-    }
-    // Acquisition Chat
+    let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
+    let stillHiring = acquisition.initialPrice.val() < acquisition.cashSpent.val(); // the new way
+    let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
+    if( stillHiring && isAffordable ) fudgeGuys.hire()
+
     for(let j = acquisition.chats().length - 1; j >= 0; j--) {
       let acqChat = acquisition.chats()[j];
       if(acqChat.finished() === true) {
@@ -236,10 +232,6 @@ class IdleClassAutomat {
         acqMail.inputText(acqMail.inputText() + " " + random( this.bizzWords ))
       }
       acqMail.respond()
-    }
-    // Acquisition Sell
-    if(acquisition.sold() === false && acquisition.currentEmployees.val() === 0) {
-      acquisition.sell()
     }
   }
   untilEmails() {
