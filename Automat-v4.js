@@ -63,18 +63,14 @@ class IdleClassAutomat {
   }
   buyStaff() {
     // reverse the loop | in favour of more "productive" units
-    for(let i = 11; i >= 0; i--) {
+    for( let i = 11; i >= 0; i-- ) {
       let employee = game.units.peek()[i];
-      // No cheating, Sir (:
-      if(!employee.available()) continue
-      // Based on current share of total income
-      let fairShare = parseFloat(employee.shareOfTotal()) / 100;
-      // ( if possible ) always buy til first 5 | to activate next higher unit
-      if(employee.num.val() <= 4 && (employee.price.val() <= game.currentCash.val())) {
-        employee.buy()
-      } else if(employee.price.val() < (game.currentCash.val() * fairShare)) {
-        employee.buy()
-      }
+      if( false === employee.available() ) continue // No cheating, Sir (:
+      // always buy the first unit of everything
+      let firstUnit = 1 > employee.num.val() && ( game.currentCash.val() >= employee.price.val());
+      // let the "rest" be biased on current share of total income
+      let fairShare = ( parseFloat(employee.shareOfTotal()) / 100 * game.currentCash.val() ) > employee.price.val();
+      if( fairShare || firstUnit ) employee.buy()
     }
   }
   replyMail() {
