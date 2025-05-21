@@ -1,14 +1,13 @@
 "use strict";
-/* An Idle Class Automat v3.5.12
- * Base structure shamelessly lended from argembarger (:
+/* WARNING: User Discretion is Advised!
+ * An Idle Class Automat v3.5.12
  * During development constantly tested in Firefox on Linux with game version 0.8.2
- * If it crashes your game, browser, machine, life.. start over ( or write your own stuff )
  */
 class IdleClassAutomat {
   // TODO setter
-  outerLoopMillis = 3300; // check the game progress | every 3.3 seconds
-  innerLoopMillis = 2200; // handle most of the game for you | every 2.2 seconds
-  cashSpendOnUpgrades = 1.0; // ration 0.67 = 67%
+  outerLoopMillis = 4400; // check the game progress | every 4.4 seconds
+  innerLoopMillis = 800; // handle most of the game for you | every 0.8 seconds
+  cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
   acquisitionStopHiringFraction = 0.666; // Default 0.666, stops hiring acq employees at less than 66.6% workers remaining, RATIO VALUE, 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
