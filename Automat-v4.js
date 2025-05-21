@@ -1,6 +1,6 @@
 "use strict";
 /* WARNING: User Discretion is Advised!
- * An Idle Class Automat v3.5.12
+ * An Idle Class Automat v4.0.1
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  */
 class IdleClassAutomat {
