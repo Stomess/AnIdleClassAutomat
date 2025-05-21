@@ -128,45 +128,23 @@ class IdleClassAutomat {
       game.research().toggleProduction(); // back on
     }
   }
-  // TODO let's try another approach ( laytor ( maybeee ) )
+  // investment helper
+  #targetTime = {
+    1: [1,12],
+    2: [1,12,70],
+    3: [1,12,70,720],
+    4: [1,12,70,720,1440]
+  };
   invest() {
-    if(game.activeInvestments().length < game.simultaneousInvestments.val()) {
-      let invBought = false;
-      let invChecks = 0;
-      // Check existing investment target times, fill shortest-found slot
-      // Remember that target time is in milliseconds; 1 min = 60000 ms
-      // Desired target times by default are 1, 12, 70, 1:59, 2:59, etc...
-      // Desired percentages by default are based on number of slots
-      // 1 slot = 50%, 2 = 40%, 3 = 30%, 4 = 20%, 5+ = 10%
-      while(invBought === false) {
-        let invTargetMins = 1;
-        let invTargetMs = 60000;
-        let invFoundTarget = false;
-        if(invChecks === 1) {
-          invTargetMins = 12;
-          invTargetMs *= invTargetMins
-        }
-        else if(invChecks === 2) {
-          invTargetMins = 70;
-          invTargetMs *= invTargetMins
-        }
-        else if(invChecks > 2) {
-          invTargetMins = 59 + (60 * (invChecks - 2));
-          invTargetMs *= invTargetMins
-        }
-        for(let i = 0; i < game.activeInvestments().length; i++) {
-          if(game.activeInvestments()[i].targetTime === invTargetMs) {
-            invFoundTarget = true
-          }
-        }
-        if(invFoundTarget === true) {
-          invChecks++
-        } else {
-          invBought = true;
-          game.makeInvestment(Math.max(60 - (game.simultaneousInvestments.val() * 10), 10), invTargetMins)
-        }
-      }
-    }
+    if( game.activeInvestments().length === game.simultaneousInvestments.val() ) return
+    let i = game.simultaneousInvestments.val();
+    if( i > 4 ) i = 4;
+    /* cheat-hint:
+     * you can "overload" the percentage of your investments
+     * but i've witnessed no real value in doing so, during early games
+     * ( and you maybe won't overload that much, in the later games )
+     */
+    game.makeInvestment( 11, this.random( this.#targetTime[i] ) )
   }
   divest() {
     if(game.pendingInvestmentCount.val() > 0) {
