@@ -201,12 +201,19 @@ class IdleClassAutomat {
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
+  #fireId = 0;
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
-    if( 1 === game.pendingAcquisitionCount.val() ) return acquisition.sell()
+    if( 1 === game.pendingAcquisitionCount.val() ) {
+      clearInterval(this.#fireId)
+      this.#fireId = 0;
+      acquisition.sell();
+      return
+    }
 
-    acquisition.fire(); // firing people acquires net value
+    // use some kinda sub-interval to massively accelerate biz termination
+    if( 0 === this.#fireId ) this.#fireId = setInterval(function(){$('button[data-bind^="click: fire"]').click()}, 100)
     let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
     let stillHiring = acquisition.initialPrice.val() > acquisition.cashSpent.val(); // the new way
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
