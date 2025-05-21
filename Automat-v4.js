@@ -54,15 +54,11 @@ class IdleClassAutomat {
     $(".top-click-value-display").text(game.earnedPerClick.displayVal()).fadeToggle()
   }
   buyUpgrades() {
-    if(this.cashSpendOnUpgrades >= 1.0) {
-      game.buyAllUpgrades()
-    } else {
-      // inverse the loop | for better gear ^^
-      for(let i = game.availableUpgrades().length - 1; i >= 0; i--) {
-        let upgr = game.availableUpgrades()[i];
-        if( upgr.cantAfford() ) continue
-        if( upgr.price.val() < ( game.currentCash.val() * this.cashSpendOnUpgrades ) ) upgr.buy()
-      }
+    // inverse the loop | for better gear ^^
+    for(let i = game.availableUpgrades().length - 1; i >= 0; i--) {
+      let upgr = game.availableUpgrades()[i];
+      if( upgr.cantAfford() ) continue
+      if( upgr.price.val() < ( game.currentCash.val() * this.cashSpendOnUpgrades ) ) upgr.buy()
     }
   }
   buyStaff() {
