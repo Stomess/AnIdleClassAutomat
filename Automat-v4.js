@@ -107,24 +107,22 @@ class IdleClassAutomat {
     setTimeout(this.stopOutgoingDelay, 5000)
   }
   stopOutgoingDelay() { this.#outgoingMailDelay = false }
-  // little r&d-helper | to improve readability of if-statement
-  more(dict, offset = 10) {
-    let name = Object.keys(dict)[0];
-    let value = dict[name];
-
-    return game.research()[name]() + offset <= game.units.peek()[value].num.val()
-  }
+  // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
+  #more = {
+    _offset: 10,
+    intern() { return this._offset + game.research().intern() <= game.units.peek()[0].num.val() },
+    slave() { return this._offset + game.research().wage() <= game.units.peek()[1].num.val() },
+    hotshot() { return this._offset + game.research().sales() <= game.units.peek()[2].num.val() },
+    middle() { return this._offset + game.research().manager() <= game.units.peek()[3].num.val() }
+  };
   /* just assign fckn all
    * we will need the storage | for motivational emails #wink
    * there are good reasons to turn away from your business from time to time
-   * ( that's when you need sell )
+   * ( that's when you need auto-sell )
    */
   doScience() {
     if( game.research().patents().length > 0 ) game.research().sellPatents();
-    // just preparing some real js-magic here
-    let intern = 0, wage = 1, sales = 2, manager = 3; // TODO see if we can do nicer than this
-    // simon sayz: only switch the machine off, if there are @ least 10 emps to "deploy" (:
-    if( this.more({intern}) || this.more({wage}) || this.more({sales}) || this.more({manager}) ) {
+    if( this.#more.intern() || this.#more.slave() || this.#more.hotshot() || this.#more.middle() ) {
       if( game.research().active() ) game.research().toggleProduction(); // off
       game.research().assignMax();
       game.research().toggleProduction(); // back on
