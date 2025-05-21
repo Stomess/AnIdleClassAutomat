@@ -147,35 +147,34 @@ class IdleClassAutomat {
     game.makeInvestment( 11, this.random( this.#targetTime[i] ) )
   }
   divest() {
-    if(game.pendingInvestmentCount.val() > 0) {
-      for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
-        // sell
-        if(game.activeInvestments()[i].timeRemaining() === 0) {
-          // acquire
-          if(game.locked().acquisitions === false && game.simultaneousInvestments.val() > 1 && game.activeAcquisitions().length < game.simultaneousAcquisitions.val()) {
-            // Only acquire investments if some better investment is not closer to completion than
-            // half of the finished investment's original target time.
-            let invSorted = game.activeInvestments().slice();
-            let invAcquired = false;
-            invSorted.sort(function(a, b){ return b.targetTime - a.targetTime });
-            for(let j = 0; j < invSorted.length; j++) {
-              if(invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
-                invAcquired = true;
-                break
-              } else if(invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
-                break
-              }
+    if( 0 === game.pendingInvestmentCount.val() ) return
+    for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
+      // sell
+      if(game.activeInvestments()[i].timeRemaining() === 0) {
+        // acquire
+        if(game.locked().acquisitions === false && game.simultaneousInvestments.val() > 1 && game.activeAcquisitions().length < game.simultaneousAcquisitions.val()) {
+          // Only acquire investments if some better investment is not closer to completion than
+          // half of the finished investment's original target time.
+          let invSorted = game.activeInvestments().slice();
+          let invAcquired = false;
+          invSorted.sort(function(a, b){ return b.targetTime - a.targetTime });
+          for(let j = 0; j < invSorted.length; j++) {
+            if(invSorted[j].targetTime === game.activeInvestments()[i].targetTime) {
+              invAcquired = true;
+              break
+            } else if(invSorted[j].timeRemaining() < game.activeInvestments()[i].targetTime * 0.5) {
+              break
             }
-            if(invAcquired === false) {
-              game.activeInvestments()[i].handlePayout()
-            } else {
-              game.activeInvestments()[i].handleAcquisition()
-            }
-          } else if(game.pendingAcquisitionCount.val() === 0) {
-            // ONLY pay out if there ISN'T a currently-pending acquisition.
-            // If an acquisition is actively paying out, do nothing, simply wait.
-            game.activeInvestments()[i].handlePayout()
           }
+          if(invAcquired === false) {
+            game.activeInvestments()[i].handlePayout()
+          } else {
+            game.activeInvestments()[i].handleAcquisition()
+          }
+        } else if(game.pendingAcquisitionCount.val() === 0) {
+          // ONLY pay out if there ISN'T a currently-pending acquisition.
+          // If an acquisition is actively paying out, do nothing, simply wait.
+          game.activeInvestments()[i].handlePayout()
         }
       }
     }
