@@ -76,9 +76,10 @@ class IdleClassAutomat {
     this.outgoingMail(); // TODO why is this somewhat coupled
     for( let i = game.mail().length - 1; i >= 0; i-- ) {
       let email = game.mail()[i];
-      if( email.replied() === true ) continue // possible cheat: uncomment that line to exploit emails
+      if( true === email.replied() ) continue // possible cheat: uncomment that line to exploit emails
       //email.inputText(email.from); // this really is a one-time achievement
-      while( email.inputText().length < 180 ) email.inputText( email.inputText() + " " + random( this.bizzWords ) )
+      email.inputText(""); // quickfix
+      while( email.inputText().length < 180 ) email.inputText( email.inputText() + " " + this.random( this.bizzWords ) )
       // going biz-words only, means more cash .. i guess
       email.respond()
     }
@@ -101,7 +102,7 @@ class IdleClassAutomat {
     }
     outgoing.to("John Wayne");
     outgoing.subject("jist doit");
-    while( outgoing.message().length < 180 ) outgoing.message(outgoing.message() + " " + random( this.bizzWords ))
+    while( outgoing.message().length < 180 ) outgoing.message(outgoing.message() + " " + this.random( this.bizzWords ))
     setTimeout(game.composedMail().send, 2000);
     setTimeout(this.stopOutgoingDelay, 5000)
   }
@@ -203,11 +204,11 @@ class IdleClassAutomat {
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
-    if( 1 = game.pendingAcquisitionCount.val() ) return acquisition.sell()
+    if( 1 === game.pendingAcquisitionCount.val() ) return acquisition.sell()
 
     acquisition.fire(); // firing people acquires net value
     let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
-    let stillHiring = acquisition.initialPrice.val() < acquisition.cashSpent.val(); // the new way
+    let stillHiring = acquisition.initialPrice.val() > acquisition.cashSpent.val(); // the new way
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
     if( stillHiring && isAffordable ) fudgeGuys.hire()
 
@@ -218,7 +219,7 @@ class IdleClassAutomat {
       } else if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
         acqChat.select();
         // The cleanest way to handle these is by using the document elements
-        document.getElementById('chat-response').value = acqChat.name + random( this.chatPhrases );
+        document.getElementById('chat-response').value = acqChat.name + this.random( this.chatPhrases );
         document.getElementsByClassName("chat-submit")[0].click()
         // TODO ( example ) $("#chat-response") etc.
       }
@@ -229,7 +230,7 @@ class IdleClassAutomat {
       if(acqMail.replied() === true) continue
       acqMail.inputText(acqMail.from + ",");
       while(acqMail.inputText().length < 180) {
-        acqMail.inputText(acqMail.inputText() + " " + random( this.bizzWords ))
+        acqMail.inputText(acqMail.inputText() + " " + this.random( this.bizzWords ))
       }
       acqMail.respond()
     }
