@@ -181,19 +181,30 @@ class IdleClassAutomat {
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
-  #fireId = 0;
+  #acqHelper = {
+    intervalId: 0,
+    workAround() {
+      // $('button[data-bind^="click: fire"]').click() // does not work, when leave the tab #sad-face
+      game.activeAcquisitions()[0].fire()
+    },
+    kickOff() {
+      this.intervalId = setInterval(this.workAround, 80)
+    },
+    setBack() {
+      clearInterval( this.intervalId );
+      this.intervalId = 0
+    }
+  };
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
     if( 1 === game.pendingAcquisitionCount.val() ) {
-      clearInterval(this.#fireId)
-      this.#fireId = 0;
+      this.#acqHelper.setBack();
       acquisition.sell();
       return
     }
-
     // use some kinda sub-interval to massively accelerate biz termination
-    if( 0 === this.#fireId ) this.#fireId = setInterval(function(){$('button[data-bind^="click: fire"]').click()}, 100)
+    if( 0 === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
     let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
     let stillHiring = acquisition.initialPrice.val() > acquisition.cashSpent.val(); // the new way
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
