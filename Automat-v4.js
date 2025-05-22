@@ -35,7 +35,7 @@ class IdleClassAutomat {
     inv: 0,
     rd: 1,
     acq: 2,
-    // 3, i guess, it's training ..
+    train: 3,
     hr: 4
   };
   bizSelfNaming() {
@@ -91,13 +91,13 @@ class IdleClassAutomat {
     this.#outgoingMailDelay = true;
     let outgoing = game.composedMail();
     if(outgoing.stressLevel.val() > 50) {
-      outgoing.selectedDepartment( this.deps.hr )
+      outgoing.selectedDepartment( this.#deps.hr )
     } else {
       /* it really does not matter
        * spamming an inactive department, will provoke a mailer-deamon in your inbox
        * ( and guess what: you can reply to that .. and generate money )
        */
-      outgoing.selectedDepartment( this.random( [ this.deps.inv, this.deps.rd, this.deps.acq ] ) );
+      outgoing.selectedDepartment( this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] ) );
       outgoing.selectedUrgency( this.random( [0, 1, 2] ) )
     }
     outgoing.to("John Wayne");
