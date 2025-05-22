@@ -176,23 +176,31 @@ class IdleClassAutomat {
     // TODO swap that piece of equipment with setting and checking goals !!
     if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
-    this.clearBothIntervals();
+    this.clearAllIntervals();
     this.#gameState.setBack();
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
   #acqHelper = {
-    intervalId: 0,
+    empPer() { return game.activeAcquisitions()[0].currentEmployees.val() / game.activeAcquisitions()[0].initialEmployees },
     workAround() {
       // $('button[data-bind^="click: fire"]').click() // does not work, when leave the tab #sad-face
-      game.activeAcquisitions()[0].fire()
+      game.activeAcquisitions()[0].fire();
+      if( this.checkVal > this.empPer() ) {
+        let _t = ( Date.now() - this.lastStamp ) / 1000 / 60;
+        console.warn(`your acquisition just hit ${this.checkVal.toFixed(1)} after approximately ${_t.toFixed(1)} minutes`);
+        this.checkVal -= 0.1;
+        this.lastStamp = Date.now()
+      }
     },
     kickOff() {
-      this.intervalId = setInterval(this.workAround, 80)
+      this.checkVal = this.empPer().toFixed(1);
+      this.intervalId = setInterval(this.workAround.bind(this), 80);
+      this.lastStamp = Date.now()
     },
     setBack() {
       clearInterval( this.intervalId );
-      this.intervalId = 0
+      this.intervalId = undefined
     }
   };
   microManage() {
@@ -204,7 +212,7 @@ class IdleClassAutomat {
       return
     }
     // use some kinda sub-interval to massively accelerate biz termination
-    if( 0 === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
+    if( undefined === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
     let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
     let stillHiring = acquisition.initialPrice.val() > acquisition.cashSpent.val(); // the new way
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
@@ -337,13 +345,14 @@ class IdleClassAutomat {
     clearInterval(this.#outerLoopId);
     this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis)
   }
-  clearBothIntervals() {
+  clearAllIntervals() {
     clearInterval(this.#outerLoopId);
-    clearInterval(this.#innerLoopId)
+    clearInterval(this.#innerLoopId);
+    this.#acqHelper.setBack()
   }
   constructor() {
     this.lazilyKickOffOuterLoop();
     // IF sht goes sideways, you can't even read the error messages, as they might fly-in 10 times a second on the browser console
-    window.onerror = this.clearBothIntervals.bind(this)
+    window.onerror = this.clearAllIntervals.bind(this)
   }
 }; let _ica = new IdleClassAutomat()
