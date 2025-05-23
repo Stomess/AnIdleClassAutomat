@@ -17,19 +17,19 @@ class IdleClassAutomat {
 
   #outerLoopId = 0;
   #innerLoopId = 0;
-  #outgoingMailDelay = false;
+  #hrBugDelay = false;
   #gameState = {
-    _current: -2,
     freshStart: 0,
     waitMail: 1,
     waitInvest: 2,
     waitScience: 3,
     waitBankrupt: 4,
     waitAcq: 5,
-    waitInfinit: 6,
+    waitOutG: 6,
+    waitInfinit: 7,
     get current() { return this._current },
     setNext() { ++this._current },
-    setBack() { this._current = this.freshStart }
+    init() { this._current = this.freshStart }
   };
   #deps = {
     inv: 0,
@@ -73,7 +73,6 @@ class IdleClassAutomat {
     }
   }
   replyMail() {
-    this.outgoingMail(); // TODO why is this somewhat coupled
     for( let i = game.mail().length - 1; i >= 0; i-- ) {
       let email = game.mail()[i];
       if( true === email.replied() ) continue // possible cheat: uncomment that line to exploit emails
@@ -84,33 +83,6 @@ class IdleClassAutomat {
       email.respond()
     }
   }
-  outgoingMail() {
-    if( true === game.locked().outgoingMail ) return
-    /* .. and here is another cheating point:
-     * resting seems to be a small 3sec time-frame, in which you cannot send mail via the user-interface
-     */
-    if( true === game.composedMail().resting() ) return
-    // TODO hiliriouse .. building a five sec delay for a split sec task ..
-    if( true === this.#outgoingMailDelay ) return
-    this.#outgoingMailDelay = true;
-    let outgoing = game.composedMail();
-    if(outgoing.stressLevel.val() > 50) {
-      outgoing.selectedDepartment( this.#deps.hr )
-    } else {
-      /* it really does not matter
-       * spamming an inactive department, will provoke a mailer-deamon in your inbox
-       * ( and guess what: you can reply to that .. and generate money )
-       */
-      outgoing.selectedDepartment( this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] ) );
-      outgoing.selectedUrgency( this.random( [0, 1, 2] ) )
-    }
-    outgoing.to("John Wayne");
-    outgoing.subject("jist doit");
-    while( outgoing.message().length < 180 ) outgoing.message(outgoing.message() + " " + this.random( this.bizzWords ))
-    game.composedMail().send();
-    setTimeout(this.stopOutgoingDelay.bind(this), 3000)
-  }
-  stopOutgoingDelay() { this.#outgoingMailDelay = false }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
   #more = {
     _offset: 10,
@@ -181,7 +153,6 @@ class IdleClassAutomat {
     if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
     this.clearAllIntervals();
-    this.#gameState.setBack();
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
@@ -245,6 +216,35 @@ class IdleClassAutomat {
       acqMail.respond()
     }
   }
+  simplyWaitForIt() {
+    game.composedMail().send();
+    this.#hrBugDelay = false
+  }
+  hrWorkaround() {
+    if( true === this.#hrBugDelay ) return
+    this.#hrBugDelay = true;
+    let _msg = ""; while( _msg.length < 180 ) _msg += " " + this.random( this.bizzWords )
+    game.composedMail().selectedDepartment( this.#deps.hr ).to("John Wayne").subject("jist doit").message( _msg );
+    setTimeout(this.simplyWaitForIt.bind(this), 3000)
+  }
+  outgoingMail() {
+    /* .. and here is another cheating point:
+     * resting seems to be a small 3sec time-frame, in which "normal" player cannot send mail via the interface
+     */
+    if( true === game.composedMail().resting() ) return
+    if( 100 < outgoing.stressLevel.val() ) {
+      this.hrWorkaround(); // delegate!
+      return
+    }
+    /* it really does not matter
+     * spamming an inactive department, will provoke a mailer-deamon in your inbox
+     * ( and guess what: you can reply to that .. and generate money )
+     */
+    let _dep = this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
+    let _urg = this.random( [0, 1, 2] );
+    let _msg = ""; while( _msg.length < 180 ) _msg += " " + this.random( this.bizzWords )
+    game.composedMail().selectedDepartment( _dep ).selectedUrgency( _urg ).to("John Wayne").subject("jist doit").message( _msg ).send()
+  }
   untilEmails() {
     this.earnDollars();
     this.buyUpgrades();
@@ -283,7 +283,7 @@ class IdleClassAutomat {
     this.doScience();
     this.bankruptcy()
   }
-  untilInfinity() {
+  untilOutgoingMail() {
     this.earnDollars();
     this.buyUpgrades();
     this.buyStaff();
@@ -293,6 +293,18 @@ class IdleClassAutomat {
     this.doScience();
     this.bankruptcy();
     this.microManage()
+  }
+  untilInfinity() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
+    this.doScience();
+    this.bankruptcy();
+    this.microManage();
+    this.outgoingMail()
   }
   manageStateOfInnerLoop() {
     switch(this.#gameState.current) {
@@ -331,6 +343,12 @@ class IdleClassAutomat {
         if(game.locked().acquisitions === true) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
+        this.#innerLoopId = setInterval(this.untilOutgoingMail.bind(this), this.innerLoopMillis);
+        break
+      case this.#gameState.waitOutG:
+        if(game.locked().outgoingMail === true) break
+        clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitInfinit:
@@ -341,12 +359,13 @@ class IdleClassAutomat {
         break
       default:
         clearInterval(this.#innerLoopId); // grandpa sayz: better be safe than sorry
-        this.#gameState.setBack();
-        console.warn('.. the default switch-case | aka the inner rabit-hole ..')
+        console.warn(`.. you just entered the inner rabit-hole | aka default switch-case .. with game-state ${this.#gameState.current}`);
+        this.#gameState.init()
     }
   }
   lazilyKickOffOuterLoop() {
     clearInterval(this.#outerLoopId);
+    this.#gameState.init();
     this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis)
   }
   clearAllIntervals() {
