@@ -225,7 +225,7 @@ class IdleClassAutomat {
   hrWorkaround() {
     if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
-    game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.maxBody );
+    game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.#maxBody );
     setTimeout(this.simplyWaitForIt.bind(this), 2200)
   }
   outgoingMail() {
