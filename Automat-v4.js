@@ -81,12 +81,16 @@ class IdleClassAutomat {
   }
   // centralized solution | for inbox & acquisition
   simpleMail( which ) {
-    for( let i = which.length - 1; i >= 0; i-- ) {
+    if( 0 === which.length || true === which[0].replied() ) return
+    // slow it down a nodge | just one reply per action-loop ^^
+    which[0].inputText(which[0].from + " " + this.#maxBody).respond()
+    // cheat hint: you can respond to a full inbox, but from time to time it raises serious game errors (;
+    /*for( let i = which.length - 1; i >= 0; i-- ) {
       let _mail = which[i];
       if( true === _mail.replied() ) continue // possible cheat: uncomment that line to exploit
       // using the name really doubles the benefit my friend
       _mail.inputText(_mail.from + " " + this.#maxBody).respond()
-    }
+    }*/
   }
   replyMail() { this.simpleMail( game.mail() ) }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
