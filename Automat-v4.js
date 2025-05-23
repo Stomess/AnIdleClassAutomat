@@ -217,20 +217,20 @@ class IdleClassAutomat {
     game.composedMail().send();
     this.#hrBugDelay = false
   }
+  instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   hrWorkaround() {
     if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
     game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.maxBody );
-    setTimeout(this.simplyWaitForIt.bind(this), 3000)
+    setTimeout(this.simplyWaitForIt.bind(this), 2200)
   }
   outgoingMail() {
-    /* .. and here is another cheating point:
-     * resting seems to be a small 3sec time-frame, in which "normal" player cannot send mail via the interface
-     */
-    if( true === game.composedMail().resting() ) return
-    if( 100 < outgoing.stressLevel.val() ) {
-      this.hrWorkaround(); // delegate!
-      return
+    // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
+    if( true === game.composedMail().resting() ) return // comment out to "overload"
+    // cheating point ( 2 ) | above 100 the send-button will be unavailable to "regular" players
+    if( 100 < game.composedMail().stressLevel.val() ) {
+      return this.hrWorkaround() // comment out to "overload"
+      //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 3 )
     }
     /* spamming an inactive department, will provoke a mailer-deamon in your inbox
      * ( and guess what: you can reply to that .. and generate money )
