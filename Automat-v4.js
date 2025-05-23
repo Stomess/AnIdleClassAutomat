@@ -79,20 +79,12 @@ class IdleClassAutomat {
       if( fairShare || firstUnit ) employee.buy()
     }
   }
-  // centralized solution | for inbox & acquisition
-  simpleMail( which ) {
-    if( 0 === which.length || true === which[0].replied() ) return
-    // slow it down a nodge | just one reply per action-loop ^^
-    which[0].inputText(which[0].from + " " + this.#maxBody).respond()
-    // cheat hint: you can respond to a full inbox, but from time to time it raises serious game errors (;
-    /*for( let i = which.length - 1; i >= 0; i-- ) {
-      let _mail = which[i];
-      if( true === _mail.replied() ) continue // possible cheat: uncomment that line to exploit
-      // using the name really doubles the benefit my friend
-      _mail.inputText(_mail.from + " " + this.#maxBody).respond()
-    }*/
+  replyMail() {
+    if( 0 === game.mail().length ) return
+    let _justOne = game.mail()[0];
+    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
+    _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond()
   }
-  replyMail() { this.simpleMail( game.mail() ) }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
   #more = {
     _offset: 10,
@@ -188,6 +180,11 @@ class IdleClassAutomat {
       this.intervalId = undefined
     }
   };
+  #acqMailDelay = false;
+  acqMailCircumventGameBug() {
+    game.activeAcquisitions()[0].mail()[0].respond();
+    this.#acqMailDelay = false
+  }
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
@@ -215,13 +212,20 @@ class IdleClassAutomat {
         // TODO ( example ) $("#chat-response") etc.
       }
     }
-    this.simpleMail( acquisition.mail() ) // policies
+    // policies
+    if( 0 === acquisition.mail().length ) return
+    if( true === this.#acqMailDelay ) return
+    this.#acqMailDelay = true;
+    let _justOne = acquisition.mail()[0];
+    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
+    _justOne.inputText( _justOne.from + " " + this.#maxBody );
+    setTimeout(this.acqMailCircumventGameBug.bind(this), 2200)
   }
+  instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   simplyWaitForIt() {
     game.composedMail().send();
     this.#hrBugDelay = false
   }
-  instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   hrWorkaround() {
     if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
