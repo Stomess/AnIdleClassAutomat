@@ -85,7 +85,11 @@ class IdleClassAutomat {
     }
   }
   outgoingMail() {
-    if( true === game.locked().outgoingMail || true === game.composedMail().resting() ) return
+    if( true === game.locked().outgoingMail ) return
+    /* .. and here is another cheating point:
+     * resting seems to be a small 3sec time-frame, in which you cannot send mail via the user-interface
+     */
+    if( true === game.composedMail().resting() ) return
     // TODO hiliriouse .. building a five sec delay for a split sec task ..
     if( true === this.#outgoingMailDelay ) return
     this.#outgoingMailDelay = true;
@@ -103,8 +107,8 @@ class IdleClassAutomat {
     outgoing.to("John Wayne");
     outgoing.subject("jist doit");
     while( outgoing.message().length < 180 ) outgoing.message(outgoing.message() + " " + this.random( this.bizzWords ))
-    setTimeout(game.composedMail().send, 2000);
-    setTimeout(this.stopOutgoingDelay, 5000)
+    game.composedMail().send();
+    setTimeout(this.stopOutgoingDelay.bind(this), 3000)
   }
   stopOutgoingDelay() { this.#outgoingMailDelay = false }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
@@ -194,7 +198,7 @@ class IdleClassAutomat {
       }
     },
     kickOff() {
-      this.checkVal = this.empPer().toFixed(1);
+      this.checkVal = this.empPer();
       this.intervalId = setInterval(this.workAround.bind(this), 80);
       this.lastStamp = Date.now()
     },
