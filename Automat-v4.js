@@ -198,8 +198,8 @@ class IdleClassAutomat {
     }
     // use some kinda sub-interval to massively accelerate biz termination
     if( undefined === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
-    let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value
-    let stillHiring = acquisition.initialPrice.val() > acquisition.cashSpent.val(); // the new way
+    let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value of any acquisition
+    let stillHiring = acquisition.initialPrice.val() > ( acquisition.cashSpent.val() + fudgeGuys.price.val() );
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
     if( stillHiring && isAffordable ) fudgeGuys.hire()
 
