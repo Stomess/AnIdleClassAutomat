@@ -10,8 +10,15 @@ class IdleClassAutomat {
   cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
 
+  #maxReceiver = "B2B B2C CTR EOD KPI ROI SEO";
+  //#overloadR = "B2B B2C CTR EOD KPI ROI SEO end-user end user freemium";
+  #maxSubject = "ASAP BYOD SAAS sale agile brand ideat pivot share stock";
+  //#overloadS = "ASAP BYOD SAAS sale agile brand ideat pivot share stock gamified holistic leverage outsourc overhead paradigm";
+  #maxBody = "EBITDA action bubble client equity invest iterat layoff market profit disrupt downsiz hacking innovat mission monetiz optimiz revenue startup synergy unicorn analytic ballpark customer dynamism";
+  //#overloadB = "EBITDA action bubble client equity invest iterat layoff market profit disrupt downsiz hacking innovat mission monetiz optimiz revenue startup synergy unicorn analytic ballpark customer dynamism bandwidth bootstrap cash flow crowdfund deep dive evergreen executive redundanc scaleable valuation visionary boot strap churn rate drill down enterprise evangelist hyperlocal influencer";
+
   // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
-  bizzWords = ["ASAP", "B2B", "B2C", "BYOD", "CTR", "EBITDA", "EOD", "KPI", "ROI", "SEO", "SAAS", "accelerator", "action", "advertainment", "agile", "analytic", "bandwidth", "ballpark", "best practice", "blue sky thinking", "boot strap", "bootstrap", "brand", "bubble", "cash flow", "churn rate", "circle back", "client", "content marketing", "crowdfund", "crowdsource", "customer", "deep dive", "deliverable", "digital nomad", "disrupt", "downsiz", "drill down", "dynamism", "early adopter", "end-user", "end user", "enterprise", "equity", "evangelist", "evergreen", "executive", "exit strategy", "freemium", "gamification", "gamified", "globalization", "growth hack", "golden parachute", "hacking", "holistic", "hyperlocal", "ideat", "influencer", "innovat", "intellectual property", "invest", "iterat", "layoff", "leverage", "market", "millennial", "mission", "monetiz", "moving forward", "optimiz", "outsourc", "overhead", "paradigm", "pivot", "profit", "redundanc", "revenue", "sale", "scaleable", "share", "shareholder", "stakeholder", "startup", "stock", "synergy", "thought leader", "trim the fat", "unicorn", "valuation", "visionary", "wheelhouse", "wunderkind"];
+  #muchMoreBizzWords = "millennial wheelhouse wunderkind accelerator circle back crowdsource deliverable growth hack shareholder stakeholder gamification trim the fat advertainment best practice digital nomad early adopter exit strategy globalization moving forward thought leader golden parachute blue sky thinking content marketing intellectual property"; // sorted by length, for further process optimization (;
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
   chatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
@@ -72,17 +79,16 @@ class IdleClassAutomat {
       if( fairShare || firstUnit ) employee.buy()
     }
   }
-  replyMail() {
-    for( let i = game.mail().length - 1; i >= 0; i-- ) {
-      let email = game.mail()[i];
-      if( true === email.replied() ) continue // possible cheat: uncomment that line to exploit emails
-      //email.inputText(email.from); // this really is a one-time achievement
-      email.inputText(""); // quickfix
-      while( email.inputText().length < 180 ) email.inputText( email.inputText() + " " + this.random( this.bizzWords ) )
-      // going biz-words only, means more cash .. i guess
-      email.respond()
+  // centralized solution | for inbox & acquisition
+  simpleMail( which ) {
+    for( let i = which.length - 1; i >= 0; i-- ) {
+      let _mail = which[i];
+      if( true === _mail.replied() ) continue // possible cheat: uncomment that line to exploit
+      // using the name really doubles the benefit my friend
+      _mail.inputText(_mail.from + " " + this.#maxBody).respond()
     }
   }
+  replyMail() { this.simpleMail( game.mail() ) }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
   #more = {
     _offset: 10,
@@ -205,16 +211,7 @@ class IdleClassAutomat {
         // TODO ( example ) $("#chat-response") etc.
       }
     }
-    // Acquisition Policy
-    for(let j = acquisition.mail().length - 1; j >= 0; j--) {
-      let acqMail = acquisition.mail()[j];
-      if(acqMail.replied() === true) continue
-      acqMail.inputText(acqMail.from + ",");
-      while(acqMail.inputText().length < 180) {
-        acqMail.inputText(acqMail.inputText() + " " + this.random( this.bizzWords ))
-      }
-      acqMail.respond()
-    }
+    this.simpleMail( acquisition.mail() ) // policies
   }
   simplyWaitForIt() {
     game.composedMail().send();
@@ -223,8 +220,7 @@ class IdleClassAutomat {
   hrWorkaround() {
     if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
-    let _msg = ""; while( _msg.length < 180 ) _msg += " " + this.random( this.bizzWords )
-    game.composedMail().selectedDepartment( this.#deps.hr ).to("John Wayne").subject("jist doit").message( _msg );
+    game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.maxBody );
     setTimeout(this.simplyWaitForIt.bind(this), 3000)
   }
   outgoingMail() {
@@ -236,14 +232,13 @@ class IdleClassAutomat {
       this.hrWorkaround(); // delegate!
       return
     }
-    /* it really does not matter
-     * spamming an inactive department, will provoke a mailer-deamon in your inbox
+    /* spamming an inactive department, will provoke a mailer-deamon in your inbox
      * ( and guess what: you can reply to that .. and generate money )
      */
-    let _dep = this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
-    let _urg = this.random( [0, 1, 2] );
-    let _msg = ""; while( _msg.length < 180 ) _msg += " " + this.random( this.bizzWords )
-    game.composedMail().selectedDepartment( _dep ).selectedUrgency( _urg ).to("John Wayne").subject("jist doit").message( _msg ).send()
+    let _d = this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
+    let _u = this.random( [0, 1, 2] );
+    let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
+    game.composedMail().selectedDepartment( _d ).selectedUrgency( _u ).to( _r ).subject( _s ).message( _m ).send()
   }
   untilEmails() {
     this.earnDollars();
