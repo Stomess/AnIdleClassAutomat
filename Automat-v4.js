@@ -185,13 +185,8 @@ class IdleClassAutomat {
     if( 0 === _acq.chats().length ) return
     let acqChat = _acq.chats()[0]; // do just one | we come back here ( several times a second ;)
     if( true === acqChat.finished() ) return acqChat.close()
-    if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
-      acqChat.select();
-      // The cleanest way to handle these is by using the document elements
-      document.getElementById('chat-response').value = acqChat.name + this.random( this.chatPhrases );
-      document.getElementsByClassName("chat-submit")[0].click()
-      // TODO ( example ) $("#chat-response") etc.
-    }
+    if( true === acqChat.messagesFinished ) return
+    acqChat.addMessage("You", this.random( this.chatPhrases )) // todo funsies use randomly firstName or lastName ??
   }
   #acqMailDelay = false;
   acqMailCircumventGameBug() {
