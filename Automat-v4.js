@@ -21,7 +21,7 @@ class IdleClassAutomat {
   // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
   #muchMoreBizzWords = "millennial wheelhouse wunderkind accelerator circle back crowdsource deliverable growth hack shareholder stakeholder gamification trim the fat advertainment best practice digital nomad early adopter exit strategy globalization moving forward thought leader golden parachute blue sky thinking content marketing intellectual property"; // sorted by length, for further process optimization (;
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
-  chatPhrases = ["... Are you seriously wasting my time like this?", ", I really don't want to hear about it.", ", do you feel ready to fire your friends?", ", you put our glorious company to shame.", "!! Guess what?? You are an ass!", ", have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", ", hold on, I'm playing this idle game called The Idle Class", ", hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
+  chatPhrases = ["... Are you seriously wasting my time like this?", "I really don't want to hear about it.", "do you feel ready to fire your friends?", "you put our glorious company to shame.", "!! Guess what?? You are an ass!", "have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", "hold on, I'm playing this idle game called The Idle Class", "hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
   #outerLoopId = 0;
   #innerLoopId = 0;
@@ -220,6 +220,13 @@ class IdleClassAutomat {
     this.chittyChat( acquisition );
     this.acceptPolicies( acquisition )
   }
+  exploitingCurrentGameBug() {
+    try {
+      game.composedMail().selectedDepartment(4).send()
+    } catch( e ) {
+      console.warn(`we just avoided game-error ${e}`)
+    }
+  }
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   simplyWaitForIt() {
     game.composedMail().send();
@@ -234,10 +241,11 @@ class IdleClassAutomat {
   outgoingMail() {
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
     if( true === game.composedMail().resting() ) return // comment out to "overload"
-    // cheating point ( 2 ) | above 100 the send-button will be unavailable to "regular" players
+    // cheating point ( 2.0 ) | above 100 the send-button will be unavailable to "regular" players
     if( 100 < game.composedMail().stressLevel.val() ) {
       return this.hrWorkaround() // comment out to "overload"
-      //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 3 )
+      //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 2.1 )
+      //this.exploitingCurrentGameBug() // currently a somewhat dirty alternative for total stress relief ^^
     }
     /* spamming an inactive department, will provoke a mailer-deamon in your inbox
      * ( and guess what: you can reply to that .. and generate money )
