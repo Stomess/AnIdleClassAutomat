@@ -202,6 +202,24 @@ class IdleClassAutomat {
     _justOne.inputText( _justOne.from + " " + this.#maxBody );
     setTimeout(this.acqMailCircumventGameBug.bind(this), this.currentMailBugTimeout)
   }
+  acqHireHelper = {
+    layoffs: 0,
+    policies: 1,
+    fudging: 2,
+    chat: 3,
+    stillHiring( acq, who ) { return acq.initialPrice.val() > ( acq.cashSpent.val() + who.price.val() ) },
+    isAffordable( acq, who ) { return acq.netValue.val() > who.price.val() }
+  };
+  acqHire( _acq ) {
+    // fudging is always our base "currency" here
+    let me = _acq.workers()[this.acqHireHelper.fudging];
+    // if we reach ten fudge-guys ( only big businesses ), we go for the policies
+    if( 10 < me.num() && 0 === me.num() % 3 ) me = _acq.workers()[this.acqHireHelper.policies]
+    // on the way, we hire a few layoffs, to speed things up a little ( every four fudge-guys )
+    if( 1 < me.num() && 0 === me.num() % 4 ) me = _acq.workers()[this.acqHireHelper.fudging]
+    if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
+    // right now chat seems a bit "unreachable" ( anyway, for total automation )
+  }
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
@@ -212,11 +230,7 @@ class IdleClassAutomat {
     }
     // use some kinda sub-interval to massively accelerate biz termination
     if( undefined === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
-    let fudgeGuys = acquisition.workers()[2]; // this and this only will massively boost the net-value of any acquisition
-    let stillHiring = acquisition.initialPrice.val() > ( acquisition.cashSpent.val() + fudgeGuys.price.val() );
-    let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
-    if( stillHiring && isAffordable ) fudgeGuys.hire()
-
+    this.acqHire( acquisition ); // delegation is key here (:
     this.chittyChat( acquisition );
     this.acceptPolicies( acquisition )
   }
