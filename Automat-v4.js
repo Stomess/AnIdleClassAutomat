@@ -9,7 +9,7 @@ class IdleClassAutomat {
   innerLoopMillis = 800; // handle most of the game for you | every 0.8 seconds
   cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
-  currentMailBugTimeout = 2200;
+  currentMailBugTimeout = 3300;
 
   #maxReceiver = "B2B B2C CTR EOD KPI ROI SEO";
   //#overloadR = "B2B B2C CTR EOD KPI ROI SEO end-user end user freemium";
@@ -162,7 +162,6 @@ class IdleClassAutomat {
   #acqHelper = {
     empPer() { return game.activeAcquisitions()[0].currentEmployees.val() / game.activeAcquisitions()[0].initialEmployees },
     workAround() {
-      // $('button[data-bind^="click: fire"]').click() // does not work, when leave the tab #sad-face
       game.activeAcquisitions()[0].fire();
       if( this.checkVal > this.empPer() ) {
         let _t = ( Date.now() - this.lastStamp ) / 1000 / 60;
@@ -213,12 +212,8 @@ class IdleClassAutomat {
   acqHire( _acq ) {
     // fudging is always our base "currency" here
     let me = _acq.workers()[this.acqHireHelper.fudging];
-    // if we reach ten fudge-guys ( only big businesses ), we go for the policies
-    if( 10 < me.num() && 0 === me.num() % 3 ) me = _acq.workers()[this.acqHireHelper.policies]
-    // on the way, we hire a few layoffs, to speed things up a little ( every four fudge-guys )
-    if( 1 < me.num() && 0 === me.num() % 4 ) me = _acq.workers()[this.acqHireHelper.fudging]
+    // todo more complex logic ( and excessive testing ) later
     if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
-    // right now chat seems a bit "unreachable" ( anyway, for total automation )
   }
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
@@ -231,8 +226,8 @@ class IdleClassAutomat {
     // use some kinda sub-interval to massively accelerate biz termination
     if( undefined === this.#acqHelper.intervalId ) this.#acqHelper.kickOff()
     this.acqHire( acquisition ); // delegation is key here (:
-    this.chittyChat( acquisition );
-    this.acceptPolicies( acquisition )
+    //this.chittyChat( acquisition ); // todo bugfix
+    //this.acceptPolicies( acquisition ) // todo bugfix
   }
   exploitingCurrentGameBug() {
     try {
