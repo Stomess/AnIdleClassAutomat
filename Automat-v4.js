@@ -252,7 +252,7 @@ class IdleClassAutomat {
     if( true === game.composedMail().resting() ) return // comment out to "overload"
     // cheating point ( 2.0 ) | above 100 the send-button will be unavailable to "regular" players
     if( 100 < game.composedMail().stressLevel.val() ) {
-      return this.hrWorkaround() // comment out to "overload"
+      return // todo we obviously need separate intervals this.hrWorkaround() // comment out to "overload"
       //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 2.1 )
       //this.exploitingCurrentGameBug() // currently a somewhat dirty alternative for total stress relief ^^
     }
