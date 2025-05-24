@@ -9,6 +9,7 @@ class IdleClassAutomat {
   innerLoopMillis = 800; // handle most of the game for you | every 0.8 seconds
   cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
+  currentMailBugTimeout = 2200;
 
   #maxReceiver = "B2B B2C CTR EOD KPI ROI SEO";
   //#overloadR = "B2B B2C CTR EOD KPI ROI SEO end-user end user freemium";
@@ -180,10 +181,31 @@ class IdleClassAutomat {
       this.intervalId = undefined
     }
   };
+  chittyChat( _acq ) {
+    if( 0 === _acq.chats().length ) return
+    let acqChat = _acq.chats()[0]; // do just one | we come back here ( several times a second ;)
+    if( true === acqChat.finished() ) return acqChat.close()
+    if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
+      acqChat.select();
+      // The cleanest way to handle these is by using the document elements
+      document.getElementById('chat-response').value = acqChat.name + this.random( this.chatPhrases );
+      document.getElementsByClassName("chat-submit")[0].click()
+      // TODO ( example ) $("#chat-response") etc.
+    }
+  }
   #acqMailDelay = false;
   acqMailCircumventGameBug() {
     game.activeAcquisitions()[0].mail()[0].respond();
     this.#acqMailDelay = false
+  }
+  acceptPolicies( _acq ) {
+    if( 0 === _acq.mail().length ) return
+    if( true === this.#acqMailDelay ) return
+    this.#acqMailDelay = true;
+    let _justOne = _acq.mail()[0];
+    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
+    _justOne.inputText( _justOne.from + " " + this.#maxBody );
+    setTimeout(this.acqMailCircumventGameBug.bind(this), this.currentMailBugTimeout)
   }
   microManage() {
     if( 0 === game.activeAcquisitions().length ) return
@@ -200,26 +222,8 @@ class IdleClassAutomat {
     let isAffordable = acquisition.netValue.val() > fudgeGuys.price.val();
     if( stillHiring && isAffordable ) fudgeGuys.hire()
 
-    for(let j = acquisition.chats().length - 1; j >= 0; j--) {
-      let acqChat = acquisition.chats()[j];
-      if(acqChat.finished() === true) {
-        acqChat.close()
-      } else if(acqChat.messages().length > 0 && acqChat.messages()[acqChat.messages().length - 1].source !== "You") {
-        acqChat.select();
-        // The cleanest way to handle these is by using the document elements
-        document.getElementById('chat-response').value = acqChat.name + this.random( this.chatPhrases );
-        document.getElementsByClassName("chat-submit")[0].click()
-        // TODO ( example ) $("#chat-response") etc.
-      }
-    }
-    // policies
-    if( 0 === acquisition.mail().length ) return
-    if( true === this.#acqMailDelay ) return
-    this.#acqMailDelay = true;
-    let _justOne = acquisition.mail()[0];
-    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
-    _justOne.inputText( _justOne.from + " " + this.#maxBody );
-    setTimeout(this.acqMailCircumventGameBug.bind(this), 2200)
+    this.chittyChat( acquisition );
+    this.acceptPolicies( acquisition )
   }
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   simplyWaitForIt() {
@@ -230,7 +234,7 @@ class IdleClassAutomat {
     if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
     game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.#maxBody );
-    setTimeout(this.simplyWaitForIt.bind(this), 2200)
+    setTimeout(this.simplyWaitForIt.bind(this), this.currentMailBugTimeout)
   }
   outgoingMail() {
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
