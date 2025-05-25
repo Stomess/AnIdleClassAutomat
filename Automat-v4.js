@@ -237,22 +237,23 @@ class IdleClassAutomat {
     }
   }
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
+  justWaitSomeMore() { this.#hrBugDelay = false }
   simplyWaitForIt() {
     game.composedMail().send();
-    this.#hrBugDelay = false
+    setTimeout(this.justWaitSomeMore.bind(this), 3300)
   }
   hrWorkaround() {
-    if( true === this.#hrBugDelay ) return
     this.#hrBugDelay = true;
     game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.#maxBody );
-    setTimeout(this.simplyWaitForIt.bind(this), this.currentMailBugTimeout)
+    setTimeout(this.simplyWaitForIt.bind(this), 2200)
   }
   outgoingMail() {
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
     if( true === game.composedMail().resting() ) return // comment out to "overload"
+    if( true === this.#hrBugDelay ) return
     // cheating point ( 2.0 ) | above 100 the send-button will be unavailable to "regular" players
     if( 100 < game.composedMail().stressLevel.val() ) {
-      return // todo we obviously need separate intervals this.hrWorkaround() // comment out to "overload"
+      return // it simply does not work, as soon as you leave mail tab #sad-face this.hrWorkaround() // comment out to "overload"
       //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 2.1 )
       //this.exploitingCurrentGameBug() // currently a somewhat dirty alternative for total stress relief ^^
     }
