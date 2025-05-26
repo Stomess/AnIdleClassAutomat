@@ -238,21 +238,25 @@ class IdleClassAutomat {
     }
   }
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
+  #antiStress = false;
   outgoingMail() {
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
     if( true === game.composedMail().resting() ) return // comment out to "overload"
-    // cheating point ( 2.0 ) | above 100 the send-button will be unavailable to "regular" players
-    if( 100 < game.composedMail().stressLevel.val() ) {
-      return // todo we obviously need separate intervals this.hrWorkaround() // comment out to "overload"
-      //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 2.1 )
-      //this.exploitingCurrentGameBug() // currently a somewhat dirty alternative for total stress relief ^^
-    }
     /* spamming an inactive department, will provoke a mailer-deamon in your inbox
      * ( and guess what: you can reply to that .. and generate money )
      */
-    let _d = this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
+    // cheating point ( 2 ) | above 100 the send-button will be unavailable to "regular" players
+    if( 100 < game.composedMail().stressLevel.val() ) {
+      //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 3 )
+      //this.exploitingCurrentGameBug() // currently a somewhat dirty alternative for total stress relief ^^
+      this.#antiStress = true // comment out, to just spam departments ( beyond real )
+    }
+    if( 50 > game.composedMail().stressLevel.val() ) this.#antiStress = false
+
+    let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
     let _u = this.random( ["0", "1", "2"] );
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
+
     game.composedMail().selectedDepartment( _d ).selectedUrgency( _u ).to( _r ).subject( _s ).message( _m ).send()
   }
   guaranteedWindfall() {
