@@ -100,9 +100,10 @@ class IdleClassAutomat {
    */
   doScience() {
     if( game.research().patents().length > 0 ) game.research().sellPatents();
-    if( this.#more.intern() || this.#more.slave() || this.#more.hotshot() || this.#more.middle() ) {
+    if( this.#more.intern() || this.#more.slave() /*|| this.#more.hotshot()*/ || this.#more.middle() ) {
       if( game.research().active() ) game.research().toggleProduction(); // off
       game.research().assignMax();
+      game.research().sales(0);
       game.research().toggleProduction(); // back on
     }
   }
