@@ -155,6 +155,8 @@ class IdleClassAutomat {
     // TODO swap that piece of equipment with setting and checking goals !!
     if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
+    //alert(`"old" goals passed == ${game.nextBankruptcyBonus.val()}\n\nnew goals set == ${game.goals().goalSet()}`)
+
     this.clearAllIntervals();
     game.restartGame();
     this.lazilyKickOffOuterLoop()
