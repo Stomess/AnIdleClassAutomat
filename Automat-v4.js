@@ -91,19 +91,16 @@ class IdleClassAutomat {
     intern() { return this._offset + game.research().intern() <= game.units.peek()[0].num.val() },
     slave() { return this._offset + game.research().wage() <= game.units.peek()[1].num.val() },
     hotshot() { return this._offset + game.research().sales() <= game.units.peek()[2].num.val() },
-    middle() { return this._offset + game.research().manager() <= game.units.peek()[3].num.val() }
+    middle() { return !game.locked().outgoingMail && this._offset + game.research().manager() <= game.units.peek()[3].num.val() }
   };
-  /* just assign fckn all
-   * we will need the storage | for motivational emails #wink
-   * there are good reasons to turn away from your business from time to time
-   * ( that's when you need auto-sell )
-   */
   doScience() {
     if( game.research().patents().length > 0 ) game.research().sellPatents();
     if( this.#more.intern() || this.#more.slave() /*|| this.#more.hotshot()*/ || this.#more.middle() ) {
       if( game.research().active() ) game.research().toggleProduction(); // off
+      // simply assign all | we will need the storage ( for motivational emails #wink )
       game.research().assignMax();
       game.research().sales(0);
+      if( game.locked().outgoingMail ) game.research().manager(0)
       game.research().toggleProduction(); // back on
     }
   }
