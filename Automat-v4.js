@@ -262,7 +262,7 @@ class IdleClassAutomat {
      * ( and guess what: you can reply to that .. and generate money )
      */
     let _d = this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
-    let _u = this.random( [0, 1, 2] );
+    let _u = this.random( ["0", "1", "2"] );
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
     game.composedMail().selectedDepartment( _d ).selectedUrgency( _u ).to( _r ).subject( _s ).message( _m ).send()
   }
