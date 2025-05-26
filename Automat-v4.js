@@ -167,7 +167,7 @@ class IdleClassAutomat {
       game.activeAcquisitions()[0].fire();
       if( this.checkVal > this.burnDown() ) {
         let _t = ( ( Date.now() - this.firstStamp ) / 1000 / 60 ).toFixed(1);
-        console.warn(`acquisition down to ${this.checkVal} of this.initEmp after approximately ${_t} minutes`);
+        console.warn(`acquisition down to ${this.checkVal} of ${this.initEmp} after approximately ${_t} minutes`);
         this.checkVal -= 0.1
       }
     },
