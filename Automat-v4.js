@@ -24,7 +24,6 @@ class IdleClassAutomat {
 
   #outerLoopId = 0;
   #innerLoopId = 0;
-  #hrBugDelay = false;
   #gameState = {
     freshStart: 0,
     waitMail: 1,
@@ -239,16 +238,6 @@ class IdleClassAutomat {
     }
   }
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
-  simplyWaitForIt() {
-    game.composedMail().send();
-    this.#hrBugDelay = false
-  }
-  hrWorkaround() {
-    if( true === this.#hrBugDelay ) return
-    this.#hrBugDelay = true;
-    game.composedMail().selectedDepartment( this.#deps.hr ).to( this.#maxReceiver ).subject( this.#maxSubject ).message( this.#maxBody );
-    setTimeout(this.simplyWaitForIt.bind(this), this.currentMailBugTimeout)
-  }
   outgoingMail() {
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
     if( true === game.composedMail().resting() ) return // comment out to "overload"
