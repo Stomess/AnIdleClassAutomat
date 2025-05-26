@@ -40,11 +40,11 @@ class IdleClassAutomat {
     init() { this._current = this.freshStart }
   };
   #deps = {
-    inv: 0,
-    rd: 1,
-    acq: 2,
-    train: 3,
-    hr: 4
+    inv: "0",
+    rd: "1",
+    acq: "2",
+    train: "3",
+    hr: "4"
   };
   bizSelfNaming() {
     if( "Unnamed Business" !== game.businessName().name() ) return;
