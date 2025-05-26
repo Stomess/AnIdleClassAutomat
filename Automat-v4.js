@@ -172,8 +172,8 @@ class IdleClassAutomat {
       }
     },
     kickOff() {
-      this.checkVal = 0.9;
       this.initEmp = game.activeAcquisitions()[0].initialEmployees;
+      this.checkVal = this.burnDown().toFIxed(1);
       this.firstStamp = Date.now();
       this.intervalId = setInterval(this.workAround.bind(this), 80)
     },
