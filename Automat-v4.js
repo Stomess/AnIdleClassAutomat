@@ -168,7 +168,7 @@ class IdleClassAutomat {
       if( this.checkVal > this.burnDown() ) {
         let _t = ( ( Date.now() - this.firstStamp ) / 1000 / 60 ).toFixed(1);
         console.warn(`acquisition down to ${this.checkVal} of ${this.initEmp} after approximately ${_t} minutes`);
-        this.checkVal -= 0.1
+        this.checkVal = ( this.checkVal - 0.1 ).toFixed(1)
       }
     },
     kickOff() {
