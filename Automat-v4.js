@@ -156,11 +156,11 @@ class IdleClassAutomat {
     // TODO swap that piece of equipment with setting and checking goals !!
     if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
 
-    //alert(`"old" goals passed == ${game.nextBankruptcyBonus.val()}\n\nnew goals set == ${game.goals().goalSet()}`)
+    alert(`"old" goals passed == ${game.nextBankruptcyBonus.val()}\n\nnew goals set == ${game.goals().goalSet()}`)
 
-    this.clearAllIntervals();
+    /*this.clearAllIntervals();
     game.restartGame();
-    this.lazilyKickOffOuterLoop()
+    this.lazilyKickOffOuterLoop()*/
   }
   #acqHelper = {
     empPer() { return game.activeAcquisitions()[0].currentEmployees.val() / game.activeAcquisitions()[0].initialEmployees },
