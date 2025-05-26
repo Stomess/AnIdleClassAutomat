@@ -6,7 +6,7 @@ class IdleClassAutomat {
   // TODO setter
   outerLoopMillis = 4400; // check the game progress | every 4.4 seconds
   innerLoopMillis = 800; // handle most of the game for you | every 0.8 seconds
-  cashSpendOnUpgrades = 0.9; // ration 0.67 = 67%
+  cashSpendOnUpgrades = 0.666; // ration 0.67 = 67%
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
   currentMailBugTimeout = 3300;
 
