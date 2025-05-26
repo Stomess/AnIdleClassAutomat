@@ -1,4 +1,3 @@
-"use strict";
 /* WARNING: User Discretion is Advised!
  * An Idle Class Automat v4.1.2
  * During development constantly tested in Firefox on Linux with game version 0.8.2
