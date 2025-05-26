@@ -1,5 +1,5 @@
 /* WARNING: User Discretion is Advised!
- * An Idle Class Automat v4.1.2
+ * An Idle Class Automat v4.2.6
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  */
 class IdleClassAutomat {
@@ -162,24 +162,23 @@ class IdleClassAutomat {
     this.lazilyKickOffOuterLoop()*/
   }
   #acqHelper = {
-    empPer() { return game.activeAcquisitions()[0].currentEmployees.val() / game.activeAcquisitions()[0].initialEmployees },
+    burnDown() { return game.activeAcquisitions()[0].currentEmployees.val() / this.initEmp },
     workAround() {
       game.activeAcquisitions()[0].fire();
-      if( this.checkVal > this.empPer() ) {
-        let _t = ( Date.now() - this.lastStamp ) / 1000 / 60;
-        console.warn(`your acquisition just hit ${this.checkVal.toFixed(1)} after approximately ${_t.toFixed(1)} minutes`);
-        this.checkVal -= 0.1;
-        this.lastStamp = Date.now()
+      if( this.checkVal > this.burnDown() ) {
+        let _t = ( ( Date.now() - this.firstStamp ) / 1000 / 60 ).toFixed(1);
+        console.warn(`acquisition down to ${this.checkVal} of this.initEmp after approximately ${_t} minutes`);
+        this.checkVal -= 0.1
       }
     },
     kickOff() {
-      this.checkVal = this.empPer();
-      this.intervalId = setInterval(this.workAround.bind(this), 80);
-      this.lastStamp = Date.now()
+      this.checkVal = 0.9;
+      this.initEmp = game.activeAcquisitions()[0].initialEmployees;
+      this.firstStamp = Date.now();
+      this.intervalId = setInterval(this.workAround.bind(this), 80)
     },
     setBack() {
-      clearInterval( this.intervalId );
-      this.intervalId = undefined
+      this.intervalId = clearInterval( this.intervalId )
     }
   };
   chittyChat( _acq ) {
