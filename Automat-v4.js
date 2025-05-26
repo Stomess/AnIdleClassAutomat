@@ -34,7 +34,8 @@ class IdleClassAutomat {
     waitBankrupt: 4,
     waitAcq: 5,
     waitOutG: 6,
-    waitInfinit: 7,
+    waitWindfallG: 7,
+    waitInfinit: 8,
     get current() { return this._current },
     setNext() { ++this._current },
     init() { this._current = this.freshStart }
@@ -266,6 +267,10 @@ class IdleClassAutomat {
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
     game.composedMail().selectedDepartment( _d ).selectedUrgency( _u ).to( _r ).subject( _s ).message( _m ).send()
   }
+  guaranteedWindfall() {
+    if( 100 > game.windfallProgress.val() ) return
+    game.triggerManualWindfall()
+  }
   untilEmails() {
     this.earnDollars();
     this.buyUpgrades();
@@ -315,7 +320,7 @@ class IdleClassAutomat {
     this.bankruptcy();
     this.microManage()
   }
-  untilInfinity() {
+  untilWindfallGuarantee() {
     this.earnDollars();
     this.buyUpgrades();
     this.buyStaff();
@@ -326,6 +331,20 @@ class IdleClassAutomat {
     this.bankruptcy();
     this.microManage();
     this.outgoingMail()
+  }
+  // doin 10+ things, in a split second, totally sound like Automat ( but will ultimately "break" parts of the game flow .. )
+  untilInfinity() {
+    this.earnDollars();
+    this.buyUpgrades();
+    this.buyStaff();
+    this.replyMail();
+    this.invest();
+    this.divest();
+    this.doScience();
+    this.bankruptcy();
+    this.microManage();
+    this.outgoingMail(),
+    this.guaranteedWindfall()
   }
   manageStateOfInnerLoop() {
     switch(this.#gameState.current) {
@@ -368,6 +387,12 @@ class IdleClassAutomat {
         break
       case this.#gameState.waitOutG:
         if(game.locked().outgoingMail === true) break
+        clearInterval(this.#innerLoopId);
+        this.#gameState.setNext();
+        this.#innerLoopId = setInterval(this.untilWindfallGuarantee.bind(this), this.innerLoopMillis);
+        break
+      case this.#gameState.waitWindfallG:
+        if(game.locked().windfallGuarantee === true) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
