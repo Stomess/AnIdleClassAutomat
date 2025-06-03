@@ -71,7 +71,7 @@ class IdleClassAutomat {
     // reverse the loop | in favour of more "productive" units
     for( let i = 11; i >= 0; i-- ) {
       let employee = game.units.peek()[i];
-      if( !employee.available() ) continue // No cheating, Sir (:
+      if( !employee.available() || employee.workStopped() ) continue // No cheating, Sir (:
       if( employee.cantAfford() ) continue
       // always buy the first unit of everything
       let firstUnit = 1 > employee.num.val() && ( game.currentCash.val() >= employee.price.val());
@@ -81,7 +81,7 @@ class IdleClassAutomat {
     }
   }
   replyMail() {
-    if( 0 === game.mail().length || game.goals().currentNoMail() ) return
+    if( 0 === game.mail().length || game.goals().currentNoMail() || game.obstacles().crashed() ) return
     let _justOne = game.mail()[0];
     if( true === _justOne.replied() ) return // comment out | for possible exploit (;
     _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond()
@@ -240,8 +240,9 @@ class IdleClassAutomat {
   instantStressRelief( currentLvL) { game.composedMail().lowerStress(1, currentLvL, 1) }
   #antiStress = false;
   outgoingMail() {
+    if( game.obstacles().crashed() ) return // maybe cheatpoint, i did not test it
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
-    if( true === game.composedMail().resting() ) return // comment out to "overload"
+    if( game.composedMail().resting() ) return // comment out to "overload"
     /* spamming an inactive department, will provoke a mailer-deamon in your inbox
      * ( and guess what: you can reply to that .. and generate money )
      */
