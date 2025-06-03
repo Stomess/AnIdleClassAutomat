@@ -114,7 +114,7 @@ class IdleClassAutomat {
     4: [1,12,70,720,1440]
   };
   invest() {
-    if( game.activeInvestments().length === game.simultaneousInvestments.val() || game.goals().currentNoInvest() ) return
+    if( game.activeInvestments().length === game.simultaneousInvestments.val() || game.goals().currentNoInvest() || game.obstacles().downturned() ) return
     let i = game.simultaneousInvestments.val();
     if( i > 4 ) i = 4;
     /* cheat-hint:
@@ -125,9 +125,8 @@ class IdleClassAutomat {
     game.makeInvestment( 11, this.random( this.#targetTime[i] ) )
   }
   divest() {
-    if( 0 === game.pendingInvestmentCount.val() ) return // nothing to divest
+    if( 0 === game.pendingInvestmentCount.val() || 1 === game.activeAcquisitions().length || game.obstacles().downturned()) return
     if( true === game.locked().acquisitions ) return game.cashOutAllInvestments() // no fancy dancy
-    if( 1 === game.activeAcquisitions().length ) return // nothing to acquire
     // do a search, for the 1 thing that could be acquired
     for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
       let activeInv = game.activeInvestments()[i];
@@ -225,7 +224,7 @@ class IdleClassAutomat {
     if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
   }
   microManage() {
-    if( 0 === game.activeAcquisitions().length || game.goals().currentNoAcquisition() ) return
+    if( 0 === game.activeAcquisitions().length || game.goals().currentNoAcquisition() || game.obstacles().downturned() ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
     if( 1 === game.pendingAcquisitionCount.val() ) {
       this.#acqHelper.setBack();
