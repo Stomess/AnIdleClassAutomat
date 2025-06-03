@@ -73,7 +73,7 @@ class IdleClassAutomat {
       let employee = game.units.peek()[i];
       if( !employee.available() || employee.workStopped() ) continue // No cheating, Sir (:
       if( employee.cantAfford() ) continue
-      // always buy the first unit of everything
+      // always buy the first unit of everything || ATTENTION: price.val() is always dependent on the chosen rate (;
       let firstUnit = 1 > employee.num.val() && ( game.currentCash.val() >= employee.price.val());
       // let the "rest" be biased on current share of total income
       let fairShare = ( parseFloat(employee.shareOfTotal()) / 100 * game.currentCash.val() ) > employee.price.val();
@@ -141,24 +141,32 @@ class IdleClassAutomat {
   helper = {
     firstBiz: function() { return 0 === game.bankruptcies.val() },
     secondBiz: function() { return 1 === game.bankruptcies.val() },
-    anyOtherBiz: function() { return 2 <= game.bankruptcies.val() },
-    bonusLess: function( ref ) { return ref > game.nextBankruptcyBonus.val() },
-    bonusLessConfig: function( setup ) { return this.bonusLess( setup * game.stats[38].val() ) }
+    doubleBonus: function() { return ( 2 * game.stats[38].val() ) < game.nextBankruptcyBonus.val() }
   }
-  /* i strongly suggest to always check out from the first game as soon as possible
-   * as this unlocks goals ( wich further increases the multiplier )
-   */
-  bankruptcy() {
-    if( this.helper.firstBiz() && this.helper.bonusLess(1.0) ) return // secure an achievement
-    if( this.helper.secondBiz() && this.helper.bonusLess(8.0) ) return // secure another achievement
-    // TODO swap that piece of equipment with setting and checking goals !!
-    if( this.helper.anyOtherBiz() && this.helper.bonusLessConfig(this.bankruptcyResetFraction) ) return
-
-    alert(`game.nextBankruptcyBonus.val().toFixed(2) == ${game.nextBankruptcyBonus.val().toFixed(2)}\n\ngame.goals().currentBonus() == ${game.goals().currentBonus()}`)
-
-    /*this.clearAllIntervals();
+  theRealThing() {
+    this.clearAllIntervals();
     game.restartGame();
-    this.lazilyKickOffOuterLoop()*/
+    this.lazilyKickOffOuterLoop()
+  }
+  // todo
+  setGoals() {
+    this.clearAllIntervals(); // w-i-p
+    alert(`game.nextBankruptcyBonus.val().toFixed(2) == ${game.nextBankruptcyBonus.val().toFixed(2)}\n\ngame.goals().currentBonus() == ${game.goals().currentBonus()}`)
+    //this.theRealThing()
+  }
+  bankcruptFallback() {
+    if( this.helper.doubleBonus() ) this.setGoals()
+  }
+  /* quit out as soon as desirable from first game, as this unlocks business-goals
+   * ( which further increases the multiplier )
+   */
+  bankcruptOne() {
+    if( this.helper.doubleBonus() ) this.theRealThing()
+  }
+  bankruptcy() {
+    if( this.helper.firstBiz() ) return this.bankcruptOne()
+    if( 0 === game.goals().currentBonus() ) return this.bankcruptFallback()
+    if( game.goals().earningsGoalMet() ) this.setGoals()
   }
   #acqHelper = {
     burnDown() { return game.activeAcquisitions()[0].currentEmployees.val() / this.initEmp },
