@@ -71,7 +71,8 @@ class IdleClassAutomat {
     // reverse the loop | in favour of more "productive" units
     for( let i = 11; i >= 0; i-- ) {
       let employee = game.units.peek()[i];
-      if( false === employee.available() ) continue // No cheating, Sir (:
+      if( !employee.available() ) continue // No cheating, Sir (:
+      if( employee.cantAfford() ) continue
       // always buy the first unit of everything
       let firstUnit = 1 > employee.num.val() && ( game.currentCash.val() >= employee.price.val());
       // let the "rest" be biased on current share of total income
@@ -80,7 +81,7 @@ class IdleClassAutomat {
     }
   }
   replyMail() {
-    if( 0 === game.mail().length ) return
+    if( 0 === game.mail().length || game.goals().currentNoMail() ) return
     let _justOne = game.mail()[0];
     if( true === _justOne.replied() ) return // comment out | for possible exploit (;
     _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond()
@@ -94,6 +95,7 @@ class IdleClassAutomat {
     middle() { return !game.locked().outgoingMail && this._offset + game.research().manager() <= game.units.peek()[3].num.val() }
   };
   doScience() {
+    if( game.goals().currentNoResearch() ) return
     if( game.research().patents().length > 0 ) game.research().sellPatents();
     if( this.#more.intern() || this.#more.slave() /*|| this.#more.hotshot()*/ || this.#more.middle() ) {
       if( game.research().active() ) game.research().toggleProduction(); // off
@@ -112,7 +114,7 @@ class IdleClassAutomat {
     4: [1,12,70,720,1440]
   };
   invest() {
-    if( game.activeInvestments().length === game.simultaneousInvestments.val() ) return
+    if( game.activeInvestments().length === game.simultaneousInvestments.val() || game.goals().currentNoInvest() ) return
     let i = game.simultaneousInvestments.val();
     if( i > 4 ) i = 4;
     /* cheat-hint:
@@ -215,7 +217,7 @@ class IdleClassAutomat {
     if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
   }
   microManage() {
-    if( 0 === game.activeAcquisitions().length ) return
+    if( 0 === game.activeAcquisitions().length || game.goals().currentNoAcquisition() ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
     if( 1 === game.pendingAcquisitionCount.val() ) {
       this.#acqHelper.setBack();
@@ -250,9 +252,9 @@ class IdleClassAutomat {
       this.#antiStress = true // comment out, to just spam departments ( beyond real )
     }
     if( 50 > game.composedMail().stressLevel.val() ) this.#antiStress = false
-
+    // todo make changeable during game-play
     let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
-    let _u = this.random( ["0", "1", "2"] );
+    let _u = this.random( ["0", "1", "2"] ); // cheat-hint: only 1 of these really make the difference (;
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
 
     game.composedMail().selectedDepartment( _d ).selectedUrgency( _u ).to( _r ).subject( _s ).message( _m ).send()
@@ -333,7 +335,7 @@ class IdleClassAutomat {
     this.doScience();
     this.bankruptcy();
     this.microManage();
-    this.outgoingMail(),
+    this.outgoingMail();
     this.guaranteedWindfall()
   }
   manageStateOfInnerLoop() {
