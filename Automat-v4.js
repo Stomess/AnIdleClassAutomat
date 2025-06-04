@@ -1,5 +1,5 @@
 /* WARNING: User Discretion is Advised!
- * An Idle Class Automat v4.2.6
+ * An Idle Class Automat v4.3.8
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  */
 class IdleClassAutomat {
@@ -114,7 +114,8 @@ class IdleClassAutomat {
     4: [1,12,70,720,1440]
   };
   invest() {
-    if( game.activeInvestments().length === game.simultaneousInvestments.val() || game.goals().currentNoInvest() || game.obstacles().downturned() ) return
+    let _noFreeSlot = game.activeInvestments().length === game.simultaneousInvestments.val();
+    if( _noFreeSlot || game.goals().currentNoInvest() || game.obstacles().downturned() ) return
     let i = game.simultaneousInvestments.val();
     if( i > 4 ) i = 4;
     /* cheat-hint:
@@ -125,8 +126,10 @@ class IdleClassAutomat {
     game.makeInvestment( 11, this.random( this.#targetTime[i] ) )
   }
   divest() {
-    if( 0 === game.pendingInvestmentCount.val() || 1 === game.activeAcquisitions().length || game.obstacles().downturned()) return
-    if( true === game.locked().acquisitions ) return game.cashOutAllInvestments() // no fancy dancy
+    let _nothingToDivest = 0 === game.pendingInvestmentCount.val();
+    let _ongoingAcquisition = 1 === game.activeAcquisitions().length;
+    if( _nothingToDivest || _ongoingAcquisition || game.obstacles().downturned()) return
+    if( game.locked().acquisitions ) return game.cashOutAllInvestments() // no fancy dancy
     // do a search, for the 1 thing that could be acquired
     for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
       let activeInv = game.activeInvestments()[i];
@@ -191,8 +194,8 @@ class IdleClassAutomat {
   chittyChat( _acq ) {
     if( 0 === _acq.chats().length ) return
     let acqChat = _acq.chats()[0]; // do just one | we come back here ( several times a second ;)
-    if( true === acqChat.finished() ) return acqChat.close()
-    if( true === acqChat.messagesFinished ) return
+    if( acqChat.finished() ) return acqChat.close()
+    if( acqChat.messagesFinished ) return
     acqChat.addMessage("You", this.random( this.chatPhrases )) // todo funsies use randomly firstName or lastName ??
   }
   #acqMailDelay = false;
@@ -201,11 +204,11 @@ class IdleClassAutomat {
     this.#acqMailDelay = false
   }
   acceptPolicies( _acq ) {
-    if( 0 === _acq.mail().length ) return
-    if( true === this.#acqMailDelay ) return
+    let _noMail = 0 === _acq.mail().length;
+    if( _noMail || this.#acqMailDelay ) return
     this.#acqMailDelay = true;
     let _justOne = _acq.mail()[0];
-    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
+    if( _justOne.replied() ) return // comment out | for possible exploit (;
     _justOne.inputText( _justOne.from + " " + this.#maxBody );
     setTimeout(this.acqMailCircumventGameBug.bind(this), this.currentMailBugTimeout)
   }
@@ -224,7 +227,8 @@ class IdleClassAutomat {
     if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
   }
   microManage() {
-    if( 0 === game.activeAcquisitions().length || game.goals().currentNoAcquisition() || game.obstacles().downturned() ) return
+    let _noAcquisition = 0 === game.activeAcquisitions().length;
+    if( _noAcquisition || game.goals().currentNoAcquisition() || game.obstacles().downturned() ) return
     let acquisition = game.activeAcquisitions()[0]; // in the current game version there is always only 1 acquisition
     if( 1 === game.pendingAcquisitionCount.val() ) {
       this.#acqHelper.setBack();
@@ -260,7 +264,7 @@ class IdleClassAutomat {
       this.#antiStress = true // comment out, to just spam departments ( beyond real )
     }
     if( 50 > game.composedMail().stressLevel.val() ) this.#antiStress = false
-    // todo make changeable during game-play
+    // TODO massively micro-optimize, to NOT spam departments, that are currently down ( for whatevor reason ( obstacle or goal ) )
     let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
     let _u = this.random( ["0", "1", "2"] ); // cheat-hint: only 1 of these really make the difference (;
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
@@ -356,43 +360,43 @@ class IdleClassAutomat {
         this.#innerLoopId = setInterval(this.untilEmails.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitMail:
-        if(game.locked().mail === true) break
+        if( game.locked().mail ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInvestments.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitInvest:
-        if(game.locked().investments === true) break
+        if( game.locked().investments ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilResearchAndDevelopment.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitScience:
-        if(game.locked().research === true) break
+        if( game.locked().research ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilBankruptcy.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitBankrupt:
-        if(game.locked().bankruptcy === true) break
+        if( game.locked().bankruptcy ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilAcquisitions.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitAcq:
-        if(game.locked().acquisitions === true) break
+        if( game.locked().acquisitions ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilOutgoingMail.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitOutG:
-        if(game.locked().outgoingMail === true) break
+        if( game.locked().outgoingMail ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilWindfallGuarantee.bind(this), this.innerLoopMillis);
         break
       case this.#gameState.waitWindfallG:
-        if(game.locked().windfallGuarantee === true) break
+        if( game.locked().windfallGuarantee ) break
         clearInterval(this.#innerLoopId);
         this.#gameState.setNext();
         this.#innerLoopId = setInterval(this.untilInfinity.bind(this), this.innerLoopMillis);
