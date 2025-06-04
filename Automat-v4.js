@@ -295,9 +295,6 @@ class IdleClassAutomat {
     if( game.obstacles().crashed() ) return // maybe cheatpoint, i did not test it
     // cheating point ( 1 ) | resting seems to be a small 3sec time-frame, in which the "normal" mail-interface cannot be used
     if( game.composedMail().resting() ) return // comment out to "overload"
-    /* spamming an inactive department, will provoke a mailer-deamon in your inbox
-     * ( and guess what: you can reply to that .. and generate money )
-     */
     // cheating point ( 2 ) | above 100 the send-button will be unavailable to "regular" players
     if( 100 < game.composedMail().stressLevel.val() ) {
       //this.instantStressRelief( game.composedMail().stressLevel.val() ) // cheat point ( 3 )
@@ -305,8 +302,12 @@ class IdleClassAutomat {
       this.#antiStress = true // comment out, to just spam departments ( beyond real )
     }
     if( 50 > game.composedMail().stressLevel.val() ) this.#antiStress = false
-    // TODO massively micro-optimize, to NOT spam departments, that are currently down ( for whatevor reason ( obstacle or goal ) )
-    let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
+    /* spamming an inactive department, will provoke a mailer-deamon in your inbox
+     * ( and guess what: you can reply to that .. and generate money )
+     * ( ? ) "motivating" acquisition seems to counter effect massive net values
+     * TODO encouraging investment during market-downtime might end up in a "foul" investment
+     */
+    let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.train ] );
     let _u = this.random( ["0", "1", "2"] ); // cheat-hint: only 1 of these really make the difference (;
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
 
