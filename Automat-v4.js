@@ -258,10 +258,14 @@ class IdleClassAutomat {
     isAffordable( acq, who ) { return acq.netValue.val() > who.price.val() }
   };
   acqHire( _acq ) {
-    // fudging is always our base "currency" here
-    let me = _acq.workers()[this.acqHireHelper.fudging];
-    // todo more complex logic ( and excessive testing ) later
-    if( this.acqHireHelper.stillHiring( _acq, me ) && this.acqHireHelper.isAffordable( _acq, me ) ) me.hire()
+    let fudge = _acq.workers()[this.acqHireHelper.fudging];
+    let stillHiring = this.acqHireHelper.stillHiring( _acq, fudge );
+    if( stillHiring && this.acqHireHelper.isAffordable( _acq, fudge ) ) fudge.hire()
+    if( !stillHiring ) {
+      let layoff = _acq.workers()[this.acqHireHelper.layoffs];
+      let _half = layoff.num() / fudge.num();
+      if( 0.5 >= _half && this.acqHireHelper.stillHiring( _acq, layoff &&  this.acqHireHelper.isAffordable( _acq, layoff ) ) ) layoff.hire()
+    }
   }
   microManage() {
     let _noAcquisition = 0 === game.activeAcquisitions().length;
