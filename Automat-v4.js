@@ -98,7 +98,7 @@ class IdleClassAutomat {
     if( game.goals().currentNoResearch() ) return
     if( game.research().patents().length > 0 ) game.research().sellPatents();
     if( this.#more.intern() || this.#more.slave() /*|| this.#more.hotshot()*/ || this.#more.middle() ) {
-      if( game.research().active() ) game.research().toggleProduction(); // off
+      if( game.research().active() ) game.research().toggleProduction() // off
       // simply assign all | we will need the storage ( for motivational emails #wink )
       game.research().assignMax();
       game.research().sales(0);
@@ -150,10 +150,47 @@ class IdleClassAutomat {
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
-  // todo
+  #additionalGoals = [
+    game.goals().currentNoMail(),
+    game.goals().currentNoInvest(),
+    game.goals().currentNoResearch(),
+    game.goals().currentNoAcquisition(),
+    game.goals().currentNoElection()
+  ];
+  #currentObstacles = [
+    game.obstacles().workStoppagePossible(),
+    game.obstacles().serverCrashPossible(),
+    game.obstacles().marketDownturnPossible(),
+    game.obstacles().lawsuitPossible(),
+    game.obstacles().disasterPossible()
+  ];
+  _ms2h( millis ) { return millis / 1000 / 60 / 60 }
+  _someStatistix() {
+    let _cash = game.cashStats()[0].displayVal();
+    let _diff1 = Date.now() - game.stats[19].val();
+    let _biz = this._ms2h( _diff1 ).toFixed(2);
+    let _g = 0; for( let n = 0); n < this.#additionalGoals.length; n++ ) if( this.#additionalGoals[n] ) _g++
+    let _o = 0; for( let u = 0); u < this.#currentObstacles.length; u++ ) if( this.#currentObstacles[u] ) _o++
+    let old = game.stats[38].val();
+    let _inc = ( ( old + game.nextBankruptcyBonus.val() ) / old ).toFixed(2);
+    let _diff2 = _diff1 - game.goals().timeLimitGoal().goal;
+    let _bb = 0 > _diff2 ? "before" : "behind";
+    let _est = this._ms2h( _diff2 ).toFIxed(2);
+
+    let _msg = `you just made ${_cash} in about ${_biz} hours\n\nwith ${_g} additional goals set, and ${_o} obstacles active\n\nyou are ${_est} hours ${_bb} your chosen time-goal | next game might be ${_inc} times faster`;
+    alert(_msg)
+  }
+  _haltTheBiz() {
+    this.clearAllIntervals();
+    for( let n = 11; n >= 0; n-- ) {
+      if( game.units()[n].workStopped ) continue
+      game.units()[n].eliminate( game.units()[n].num.val() )
+    } // firing all units automatically stops investment, due to low income
+    if( game.research().active() ) game.research().toggleProduction()
+  }
   setGoals() {
-    this.clearAllIntervals(); // w-i-p
-    alert(`game.nextBankruptcyBonus.val().toFixed(2) == ${game.nextBankruptcyBonus.val().toFixed(2)}\n\ngame.goals().currentBonus() == ${game.goals().currentBonus()}`)
+    this._haltTheBiz();
+    this._someStatistix()
     //this.theRealThing()
   }
   bankcruptFallback() {
