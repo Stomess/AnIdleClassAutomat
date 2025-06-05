@@ -34,9 +34,22 @@ class IdleClassAutomat {
     waitOutG: 6,
     waitWindfallG: 7,
     waitInfinit: 8,
+    gameLock: [
+      function() { return game.locked().mail },
+      function() { return game.locked().investments },
+      function() { return game.locked().research },
+      function() { return game.locked().bankruptcy },
+      function() { return game.locked().acquisitions },
+      function() { return game.locked().outgoingMail },
+      function() { return game.locked().windfallGuarantee }
+    ],
     get current() { return this._current },
     setNext() { ++this._current },
-    init() { this._current = this.freshStart }
+    setBack() { this._current = this.freshStart },
+    init() {
+      this.setBack();
+      for( let a = 0; a < this.gameLock.length; a++ ) if( this.gameLock[a]() ) break; else this.setNext()
+    }
   };
   #deps = {
     inv: "0",
@@ -169,8 +182,8 @@ class IdleClassAutomat {
     let _cash = game.cashStats()[0].displayVal();
     let _diff1 = Date.now() - game.stats[19].val();
     let _biz = this._ms2h( _diff1 ).toFixed(2);
-    let _g = 0; for( let n = 0); n < this.#additionalGoals.length; n++ ) if( this.#additionalGoals[n] ) _g++
-    let _o = 0; for( let u = 0); u < this.#currentObstacles.length; u++ ) if( this.#currentObstacles[u] ) _o++
+    let _g = 0; for( let n = 0; n < this.#additionalGoals.length; n++ ) if( this.#additionalGoals[n] ) _g++
+    let _o = 0; for( let u = 0; u < this.#currentObstacles.length; u++ ) if( this.#currentObstacles[u] ) _o++
     let old = game.stats[38].val();
     let _inc = ( ( old + game.nextBankruptcyBonus.val() ) / old ).toFixed(2);
     let _diff2 = _diff1 - game.goals().timeLimitGoal().goal;
@@ -452,12 +465,12 @@ class IdleClassAutomat {
       default:
         clearInterval(this.#innerLoopId); // grandpa sayz: better be safe than sorry
         console.warn(`.. you just entered the inner rabit-hole | aka default switch-case .. with game-state ${this.#gameState.current}`);
-        this.#gameState.init()
+        this.#gameState.setBack()
     }
   }
   lazilyKickOffOuterLoop() {
     clearInterval(this.#outerLoopId);
-    this.#gameState.init();
+    this.#gameState.setBack();
     this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis)
   }
   clearAllIntervals() {
@@ -466,6 +479,7 @@ class IdleClassAutomat {
     this.#acqHelper.setBack()
   }
   constructor() {
+    this.#gameState.init();
     this.lazilyKickOffOuterLoop();
     // IF sht goes sideways, you can't even read the error messages, as they might fly-in 10 times a second on the browser console
     window.onerror = this.clearAllIntervals.bind(this)
