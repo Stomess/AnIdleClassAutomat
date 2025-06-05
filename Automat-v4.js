@@ -160,6 +160,7 @@ class IdleClassAutomat {
   }
   theRealThing() {
     this.clearAllIntervals();
+    this.#gameState.setBack();
     game.restartGame();
     this.lazilyKickOffOuterLoop()
   }
@@ -277,7 +278,7 @@ class IdleClassAutomat {
     if( !stillHiring ) {
       let layoff = _acq.workers()[this.acqHireHelper.layoffs];
       let _half = layoff.num() / fudge.num();
-      if( 0.5 >= _half && this.acqHireHelper.stillHiring( _acq, layoff &&  this.acqHireHelper.isAffordable( _acq, layoff ) ) ) layoff.hire()
+      if( 0.5 >= _half && this.acqHireHelper.stillHiring( _acq, layoff ) &&  this.acqHireHelper.isAffordable( _acq, layoff ) ) layoff.hire()
     }
   }
   microManage() {
@@ -470,7 +471,6 @@ class IdleClassAutomat {
   }
   lazilyKickOffOuterLoop() {
     clearInterval(this.#outerLoopId);
-    this.#gameState.setBack();
     this.#outerLoopId = setInterval(this.manageStateOfInnerLoop.bind(this), this.outerLoopMillis)
   }
   clearAllIntervals() {
