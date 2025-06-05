@@ -278,7 +278,7 @@ class IdleClassAutomat {
     if( !stillHiring ) {
       let layoff = _acq.workers()[this.acqHireHelper.layoffs];
       let _half = layoff.num() / fudge.num();
-      if( 0.5 >= _half && this.acqHireHelper.stillHiring( _acq, layoff ) &&  this.acqHireHelper.isAffordable( _acq, layoff ) ) layoff.hire()
+      if( 0.5 > _half && this.acqHireHelper.stillHiring( _acq, layoff ) &&  this.acqHireHelper.isAffordable( _acq, layoff ) ) layoff.hire()
     }
   }
   microManage() {
