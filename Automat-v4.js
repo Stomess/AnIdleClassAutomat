@@ -95,9 +95,14 @@ class IdleClassAutomat {
   }
   replyMail() {
     if( 0 === game.mail().length || game.goals().currentNoMail() || game.obstacles().crashed() ) return
-    let _justOne = game.mail()[0];
-    if( true === _justOne.replied() ) return // comment out | for possible exploit (;
-    _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond()
+    for( let j = 0; j < game.mail().length; j++ ) {
+      let _justOne = game.mail()[j];
+      if( _justOne.replied() ) break // comment out | for possible exploit ( ? )
+      if( _justOne.isSpecial() ) { _justOne.respond(); break } // lucrative spam ^^
+      if( _justOne.isSpam() ) continue // keep the spam ( for later "use" ;)
+      _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond();
+      break
+    }
   }
   // simon sayz: only switch off the machine, IF there are @ least 10 emps to "deploy" (:
   #more = {
