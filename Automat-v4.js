@@ -189,23 +189,24 @@ class IdleClassAutomat {
     let _inc = ( ( old + game.nextBankruptcyBonus.val() ) / old ).toFixed(2);
     let _diff2 = _diff1 - game.goals().timeLimitGoal().goal;
     let _bb = 0 > _diff2 ? "before" : "behind";
-    let _est = this._ms2h( _diff2 ).toFIxed(2);
+    let _est = this._ms2h( _diff2 ).toFixed(2);
 
     let _msg = `you just made ${_cash} in about ${_biz} hours\n\nwith ${_g} additional goals set, and ${_o} obstacles active\n\nyou are ${_est} hours ${_bb} your chosen time-goal | next game might be ${_inc} times faster`;
     alert(_msg)
   }
   _haltTheBiz() {
     this.clearAllIntervals();
+    game.buyRate('max');
     for( let n = 11; n >= 0; n-- ) {
-      if( game.units()[n].workStopped ) continue
-      game.units()[n].eliminate( game.units()[n].num.val() )
+      if( game.units()[n].workStopped() ) continue
+      game.units()[n].sell()
     } // firing all units automatically stops investment, due to low income
     if( game.research().active() ) game.research().toggleProduction()
   }
   setGoals() {
+    if( game.goals().goalSet() ) return this.theRealThing()
     this._haltTheBiz();
     this._someStatistix()
-    //this.theRealThing()
   }
   bankcruptFallback() {
     if( this.helper.doubleBonus() ) this.setGoals()
