@@ -1,5 +1,5 @@
 /* WARNING: User Discretion is Advised!
- * An Idle Class Automat v4.3.8
+ * An Idle Class Automat v4.5.12
  * During development constantly tested in Firefox on Linux with game version 0.8.2
  */
 class IdleClassAutomat {
@@ -93,12 +93,21 @@ class IdleClassAutomat {
       if( fairShare || firstUnit ) emp.buy()
     }
   }
+  bossVacation() {
+    this.#clearAllIntervals()
+  }
+  increaseInbox( wait ) {
+    if( game.mail().length < wait ) return
+    game.clearAllEmails(false)
+  }
   replyMail() {
+    if( game.awayMailInbox().active() ) return this.bossVacation()
+    if( 10 === game.inboxMax.val() || 25 === game.inboxMax.val() ) return increaseInbox( game.inboxMax.val() )
     if( 0 === game.mail().length || game.goals().currentNoMail() || game.obstacles().crashed() ) return
     for( let j = 0; j < game.mail().length; j++ ) {
       let _justOne = game.mail()[j];
       if( _justOne.replied() ) break // comment out | for possible exploit ( ? )
-      if( _justOne.isSpecial() ) { _justOne.respond(); break } // lucrative spam ^^
+      if( _justOne.isLucrative() ) { _justOne.respond(); break } // lucrative spam ^^
       if( _justOne.isSpam() ) continue // keep the spam ( for later "use" ;)
       _justOne.inputText( _justOne.from + " " + this.#maxBody ).respond();
       break
@@ -261,6 +270,7 @@ class IdleClassAutomat {
     this.#acqMailDelay = false
   }
   acceptPolicies( _acq ) {
+    // todo bugfix :: try game.viewingAcquisition().mail() instead (;
     let _noMail = 0 === _acq.mail().length;
     if( _noMail || this.#acqMailDelay ) return
     this.#acqMailDelay = true;
@@ -326,6 +336,8 @@ class IdleClassAutomat {
      * ( and guess what: you can reply to that .. and generate money )
      * ( ? ) "motivating" acquisition seems to counter effect massive net values
      * TODO encouraging investment during market-downtime might end up in a "foul" investment
+     * ACHIEVE game.activeInvestments()[0].name
+     * ACHIEVE game.research().product()
      */
     let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.train ] );
     let _u = this.random( ["0", "1", "2"] ); // cheat-hint: only 1 of these really make the difference (;
