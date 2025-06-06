@@ -94,7 +94,7 @@ class IdleClassAutomat {
     }
   }
   bossVacation() {
-    this.#clearAllIntervals()
+    this.clearAllIntervals()
   }
   increaseInbox( wait ) {
     if( game.mail().length < wait ) return
@@ -102,7 +102,7 @@ class IdleClassAutomat {
   }
   replyMail() {
     if( game.awayMailInbox().active() ) return this.bossVacation()
-    if( 10 === game.inboxMax.val() || 25 === game.inboxMax.val() ) return increaseInbox( game.inboxMax.val() )
+    if( 10 === game.inboxMax.val() || 25 === game.inboxMax.val() ) return this.increaseInbox( game.inboxMax.val() )
     if( 0 === game.mail().length || game.goals().currentNoMail() || game.obstacles().crashed() ) return
     for( let j = 0; j < game.mail().length; j++ ) {
       let _justOne = game.mail()[j];
@@ -153,10 +153,9 @@ class IdleClassAutomat {
     game.makeInvestment( 11, this.random( this.#targetTime[i] ) )
   }
   divest() {
-    let _nothingToDivest = 0 === game.pendingInvestmentCount.val();
-    let _ongoingAcquisition = 1 === game.activeAcquisitions().length;
-    if( _nothingToDivest || _ongoingAcquisition || game.obstacles().downturned()) return
+    if( game.obstacles().downturned() || 0 === game.pendingInvestmentCount.val() ) return
     if( game.locked().acquisitions ) return game.cashOutAllInvestments() // no fancy dancy
+    if( 1 === game.activeAcquisitions().length ) return
     // do a search, for the 1 thing that could be acquired
     for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
       let activeInv = game.activeInvestments()[i];
