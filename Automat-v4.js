@@ -93,8 +93,13 @@ class IdleClassAutomat {
       if( fairShare || firstUnit ) emp.buy()
     }
   }
+  // thoughts in progress ^^
   bossVacation() {
     this.clearAllIntervals()
+    // IF noMail | TRY toggle back ( ? ) ELSE set away text
+    // IF research active | switch sales to max and slaves to zero
+    // IF invest active | sell pending and do long ones (;
+    // IF acq active | TRY toggle away policy AND chat ( you also need firing per sec!? )
   }
   increaseInbox( wait ) {
     if( game.mail().length < wait ) return
@@ -102,8 +107,8 @@ class IdleClassAutomat {
   }
   replyMail() {
     if( game.awayMailInbox().active() ) return this.bossVacation()
-    if( 10 === game.inboxMax.val() || 25 === game.inboxMax.val() ) return this.increaseInbox( game.inboxMax.val() )
     if( 0 === game.mail().length || game.goals().currentNoMail() || game.obstacles().crashed() ) return
+    if( 10 === game.inboxMax.val() || 25 === game.inboxMax.val() ) return this.increaseInbox( game.inboxMax.val() )
     for( let j = 0; j < game.mail().length; j++ ) {
       let _justOne = game.mail()[j];
       if( _justOne.replied() ) break // comment out | for possible exploit ( ? )
