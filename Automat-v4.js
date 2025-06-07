@@ -159,7 +159,7 @@ class IdleClassAutomat {
   }
   divest() {
     if( game.obstacles().downturned() || 0 === game.pendingInvestmentCount.val() ) return
-    if( game.locked().acquisitions ) return game.cashOutAllInvestments() // no fancy dancy
+    if( game.locked().acquisitions || game.goals().currentNoAcquisition() ) return game.cashOutAllInvestments() // no fancy dancy
     if( 1 === game.activeAcquisitions().length ) return
     // do a search, for the 1 thing that could be acquired
     for(let i = game.activeInvestments().length - 1; i >= 0; i--) {
