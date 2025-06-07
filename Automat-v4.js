@@ -152,13 +152,15 @@ class IdleClassAutomat {
     1: [1,12],
     2: [1,12,70],
     3: [1,12,70,720],
-    4: [1,12,70,720,1440]
+    4: [1,12,70,720,1440],
+    5: [8,32,64,128,256,512,1024],
+    6: [8,40,150,300,600,900,1200]
   };
   invest() {
-    let _noFreeSlot = game.activeInvestments().length === game.simultaneousInvestments.val();
+    let _noFreeSlot = game.activeInvestments().length === game.totalSimultaneousInvestmentsAllowed.val();
     if( _noFreeSlot || game.goals().currentNoInvest() || game.obstacles().downturned() ) return
-    let i = game.simultaneousInvestments.val();
-    if( i > 4 ) i = 4;
+    let i = game.totalSimultaneousInvestmentsAllowed.val();
+    if( i > 6 ) i = 6;
     /* cheat-hint:
      * you can "overload" the percentage of your investments
      * but i've witnessed no real value in doing so, during early games
