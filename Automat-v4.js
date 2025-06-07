@@ -10,15 +10,17 @@ class IdleClassAutomat {
   bankruptcyResetFraction = 2.0; // ratio 0.67 = 67%
   currentMailBugTimeout = 3300;
 
+  // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
   #maxReceiver = "B2B B2C CTR EOD KPI ROI SEO";
   //#overloadR = "B2B B2C CTR EOD KPI ROI SEO end-user end user freemium";
   #maxSubject = "ASAP BYOD SAAS sale agile brand ideat pivot share stock";
   //#overloadS = "ASAP BYOD SAAS sale agile brand ideat pivot share stock gamified holistic leverage outsourc overhead paradigm";
   #maxBody = "EBITDA action bubble client equity invest iterat layoff market profit disrupt downsiz hacking innovat mission monetiz optimiz revenue startup synergy unicorn analytic ballpark customer dynamism";
   //#overloadB = "EBITDA action bubble client equity invest iterat layoff market profit disrupt downsiz hacking innovat mission monetiz optimiz revenue startup synergy unicorn analytic ballpark customer dynamism bandwidth bootstrap cash flow crowdfund deep dive evergreen executive redundanc scaleable valuation visionary boot strap churn rate drill down enterprise evangelist hyperlocal influencer";
+  #maxAway = "millennial wheelhouse wunderkind accelerator circle back crowdsource deliverable growth hack";
+  //#overloadAway = "shareholder stakeholder gamification trim the fat advertainment best practice digital nomad early adopter exit strategy globalization moving forward thought leader golden parachute";
+  #muchMoreBizzWords = "blue sky thinking content marketing intellectual property";
 
-  // @see https://www.reddit.com/r/TheIdleClass/comments/ehd9u1/the_absolute_best_text_bonus_for_emails/
-  #muchMoreBizzWords = "millennial wheelhouse wunderkind accelerator circle back crowdsource deliverable growth hack shareholder stakeholder gamification trim the fat advertainment best practice digital nomad early adopter exit strategy globalization moving forward thought leader golden parachute blue sky thinking content marketing intellectual property"; // sorted by length, for further process optimization (;
   // TODO exchange with shakespeare ipsum ( api ( if possible ) )
   chatPhrases = ["... Are you seriously wasting my time like this?", "I really don't want to hear about it.", "do you feel ready to fire your friends?", "you put our glorious company to shame.", "!! Guess what?? You are an ass!", "have you considered getting back to work?", ": I love hearing from you, almost as much as I hate it.", " is such a freakin tool, I mean really, they... oh ww lol!", " -- this better be good news.", ": ¯\_(ツ)_/¯", "hold on, I'm playing this idle game called The Idle Class", "hold on, my Trimps are just about to hit my target zone...", "!! Guess what?? Hevipelle eats ass!"];
 
@@ -95,11 +97,18 @@ class IdleClassAutomat {
   }
   // thoughts in progress ^^
   bossVacation() {
-    this.clearAllIntervals()
-    // IF noMail | TRY toggle back ( ? ) ELSE set away text
-    // IF research active | switch sales to max and slaves to zero
-    // IF invest active | sell pending and do long ones (;
+    this.clearAllIntervals();
+    if( game.goals().currentNoMail() ) {
+      $('input[name="email-away"]').click() // quickfix
+    } else  game.awayMailInbox().message(this.#maxAway);
+    if( game.research().active() && !game.obstacles().sued() ) {
+      game.research().toggleProduction();
+      game.research().assignMax();
+      game.research().intern(0); // slow down | todo unless 100 == game.research().autoSell.val()
+      game.research().toggleProduction()
+    }
     // IF acq active | TRY toggle away policy AND chat ( you also need firing per sec!? )
+    // IF invest active | sell pending and do long ones (;
   }
   increaseInbox( wait ) {
     if( game.mail().length < wait ) return
@@ -343,7 +352,7 @@ class IdleClassAutomat {
      * ACHIEVE game.activeInvestments()[0].name
      * ACHIEVE game.research().product()
      */
-    let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.train ] );
+    let _d = this.#antiStress ? this.#deps.hr : this.random( [ this.#deps.inv, this.#deps.rd, this.#deps.acq, this.#deps.train ] );
     let _u = this.random( ["0", "1", "2"] ); // cheat-hint: only 1 of these really make the difference (;
     let _r = this.#maxReceiver; let _s = this.#maxSubject; let _m = this.#maxBody;
 
